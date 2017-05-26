@@ -1,3 +1,6 @@
 .idea/
 /out/
 Minesweeper.iml
+.classpath
+.project
+/bin/
