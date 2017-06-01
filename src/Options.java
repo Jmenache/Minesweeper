@@ -42,8 +42,9 @@ public class Options extends JFrame {
 	private Checkbox checkRightClick;
 	private JButton btnOK;
 	private JButton btnCancel;
-	private boolean clickedOK;
 	
+	private boolean clickedOK;
+	private Level level= new Level();
 	
 	public Options(View view) {
 		setTitle("Option");
@@ -162,19 +163,46 @@ public class Options extends JFrame {
 		
 		btnOK = new JButton("OK");
 		btnOK.setBounds(322, 419, 105, 27);
-		contentPane.add(btnOK);
 		btnOK.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-			
 				clickedOK = true;
+				if(btnbeginner.isSelected()){
+					System.out.println("beginer");
+					level.setNumOfMines("30");
+					level.setHeight("9");
+					level.setWidth("9");		
+				}
+				else if(btnInter.isSelected()){
+					level.setNumOfMines("40");
+					level.setHeight("16");
+					level.setWidth("16");	
+				}
+				else if(btnAdv.isSelected()){
+					level.setNumOfMines("99");
+					level.setHeight("30");
+					level.setWidth("16");	
+				}
+				else if(btnCustom.isSelected()){
+					level.setNumOfMines(txtFieldMines.getText().trim());
+					level.setHeight(txtFieldHeight.getText().trim());
+					level.setWidth(txtFieldWidth.getText().trim());		
+				}
+				else{
+					level.setNumOfMines("30");
+					level.setHeight("9");
+					level.setWidth("9");
+				}
+				
 				setVisible(false);
 			}
 		});
+		btnOK.setActionCommand("OK");
+		contentPane.add(btnOK);
+		
 		btnCancel = new JButton("Cancel");
 		btnCancel.setBounds(444, 419, 105, 27);
-		contentPane.add(btnCancel);
 		btnCancel.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -184,11 +212,18 @@ public class Options extends JFrame {
 				dispose();
 			}
 		});
-
+		btnCancel.setActionCommand("Cancel");
+		contentPane.add(btnCancel);
+		
+		clickedOK =false;
 	}
 	public boolean isClickedOK()
 	{
 		return clickedOK;
+	}
+	public Level getLevel() {
+		System.out.println("pass getlevel");
+		return level;
 	}
 
 }
