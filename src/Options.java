@@ -1,20 +1,18 @@
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
-import java.awt.GridLayout;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JTextPane;
+
 import javax.swing.JTextField;
 import java.awt.Checkbox;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 
 @SuppressWarnings("serial")
-public class option_ex extends JFrame {
+public class Options extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel lblTitle;
@@ -23,49 +21,32 @@ public class option_ex extends JFrame {
 	private JLabel lblMines;
 	private JLabel lblxTilesGrid;
 	private JLabel lblBeginner;
-	private JRadioButton radioButton;
+	private JRadioButton btnInter;
 	private JLabel lblMines_1;
 	private JLabel lblxTilesGrid_1;
 	private JLabel lblIntermediate;
-	private JRadioButton radioButton_1;
+	private JRadioButton btnAdv;
 	private JLabel lblMines_2;
 	private JLabel lblxTilesGrid_2;
 	private JLabel lblAdvanced;
-	private JRadioButton radioButton_2;
+	private JRadioButton btnCustom;
 	private JLabel lblCustom;
 	private JLabel lblHeight;
 	private JLabel lblWidth;
 	private JLabel lblMines_3;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JPanel panel_1;
-	private Checkbox checkbox;
-	private Checkbox checkbox_1;
-	private Checkbox checkbox_2;
+	private JTextField txtFieldHeight;
+	private JTextField txtFieldWidth;
+	private JTextField txtFieldMines;
+	private Checkbox checkSave;
+	private Checkbox checkContinue;
+	private Checkbox checkRightClick;
 	private JButton btnOK;
 	private JButton btnCancel;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					option_ex frame = new option_ex();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
-	public option_ex() {
+	private boolean clickedOK;
+	
+	
+	public Options(View view) {
+		setTitle("Option");
 		setAutoRequestFocus(false);
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -100,9 +81,9 @@ public class option_ex extends JFrame {
 		lblBeginner.setBounds(55, 31, 62, 18);
 		panel.add(lblBeginner);
 		
-		radioButton = new JRadioButton("");
-		radioButton.setBounds(23, 94, 25, 45);
-		panel.add(radioButton);
+		btnInter = new JRadioButton("");
+		btnInter.setBounds(23, 94, 25, 45);
+		panel.add(btnInter);
 		
 		lblMines_1 = new JLabel("40 mines");
 		lblMines_1.setBounds(55, 127, 59, 18);
@@ -116,9 +97,9 @@ public class option_ex extends JFrame {
 		lblIntermediate.setBounds(55, 107, 84, 18);
 		panel.add(lblIntermediate);
 		
-		radioButton_1 = new JRadioButton("");
-		radioButton_1.setBounds(23, 169, 25, 45);
-		panel.add(radioButton_1);
+		btnAdv = new JRadioButton("");
+		btnAdv.setBounds(23, 169, 25, 45);
+		panel.add(btnAdv);
 		
 		lblMines_2 = new JLabel("99 mines");
 		lblMines_2.setBounds(55, 201, 59, 18);
@@ -132,9 +113,9 @@ public class option_ex extends JFrame {
 		lblAdvanced.setBounds(55, 181, 84, 18);
 		panel.add(lblAdvanced);
 		
-		radioButton_2 = new JRadioButton("");
-		radioButton_2.setBounds(236, 18, 25, 45);
-		panel.add(radioButton_2);
+		btnCustom = new JRadioButton("");
+		btnCustom.setBounds(236, 18, 25, 45);
+		panel.add(btnCustom);
 		
 		lblCustom = new JLabel("Custom :");
 		lblCustom.setBounds(268, 30, 84, 18);
@@ -152,44 +133,62 @@ public class option_ex extends JFrame {
 		lblMines_3.setBounds(268, 169, 109, 18);
 		panel.add(lblMines_3);
 		
-		textField = new JTextField();
-		textField.setBounds(397, 68, 116, 24);
-		panel.add(textField);
-		textField.setColumns(10);
+		txtFieldHeight = new JTextField();
+		txtFieldHeight.setBounds(397, 68, 116, 24);
+		panel.add(txtFieldHeight);
+		txtFieldHeight.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(397, 121, 116, 24);
-		panel.add(textField_1);
+		txtFieldWidth = new JTextField();
+		txtFieldWidth.setColumns(10);
+		txtFieldWidth.setBounds(397, 121, 116, 24);
+		panel.add(txtFieldWidth);
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(397, 169, 116, 24);
-		panel.add(textField_2);
+		txtFieldMines = new JTextField();
+		txtFieldMines.setColumns(10);
+		txtFieldMines.setBounds(397, 169, 116, 24);
+		panel.add(txtFieldMines);
 		
-		panel_1 = new JPanel();
-		panel_1.setBounds(5, 458, 568, 1);
-		contentPane.add(panel_1);
-		panel_1.setLayout(null);
+		checkSave = new Checkbox("    Always save game on exit");
+		checkSave.setBounds(36, 309, 376, 25);
+		contentPane.add(checkSave);
 		
-		checkbox = new Checkbox("    Always save game on exit");
-		checkbox.setBounds(36, 309, 376, 25);
-		contentPane.add(checkbox);
+		checkContinue = new Checkbox("    Always continue saved games");
+		checkContinue.setBounds(36, 340, 376, 25);
+		contentPane.add(checkContinue);
 		
-		checkbox_1 = new Checkbox("    Always continue saved games");
-		checkbox_1.setBounds(36, 340, 376, 25);
-		contentPane.add(checkbox_1);
-		
-		checkbox_2 = new Checkbox("    Allows question marks (on double right-click)");
-		checkbox_2.setBounds(36, 371, 376, 25);
-		contentPane.add(checkbox_2);
+		checkRightClick = new Checkbox("    Allows question marks (on double right-click)");
+		checkRightClick.setBounds(36, 371, 376, 25);
+		contentPane.add(checkRightClick);
 		
 		btnOK = new JButton("OK");
 		btnOK.setBounds(322, 419, 105, 27);
 		contentPane.add(btnOK);
-		
+		btnOK.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+			
+				clickedOK = true;
+				setVisible(false);
+			}
+		});
 		btnCancel = new JButton("Cancel");
 		btnCancel.setBounds(444, 419, 105, 27);
 		contentPane.add(btnCancel);
+		btnCancel.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				clickedOK = false;
+				setVisible(false);
+				dispose();
+			}
+		});
+
 	}
+	public boolean isClickedOK()
+	{
+		return clickedOK;
+	}
+
 }

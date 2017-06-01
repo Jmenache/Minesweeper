@@ -1,5 +1,12 @@
 import javax.swing.*;
+
+import PhoneBook.Contact;
+import PhoneBook.ContactPanel;
+import PhoneBook.Phonebook;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.FileWriter;
 import java.net.URL;
@@ -65,6 +72,19 @@ class View {
         gameMenu.addSeparator();
         gameMenu.add(StatisticsItem);
         gameMenu.add(OptionsItem);
+        OptionsItem.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Options option = new Options(View.this);
+				option.setVisible(true);
+				/*if (option.isClickedOK())
+				{
+				//-----------------------------
+				}*/
+				//option.dispose();
+			}
+        });
         gameMenu.addSeparator();
         gameMenu.add(exitItem);
 
