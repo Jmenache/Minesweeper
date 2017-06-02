@@ -1,3 +1,4 @@
+package MenuSet;
 import javax.swing.*;
 
 import java.awt.*;
@@ -24,8 +25,9 @@ class View extends JFrame {
     private int row=5;
     private int col=5;
     private int mines=3;
-
-
+	Options option = new Options(View.this);
+	private boolean isuesed;
+	
     View() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -34,7 +36,7 @@ class View extends JFrame {
         }
 
         frame = new JFrame(TITLE);
-        URL mineIconURL = getClass().getResource("images/mineIcon.png");
+        URL mineIconURL = getClass().getResource("/images/mineIcon.png");
         ImageIcon mineIcon = new ImageIcon(mineIconURL);
         frame.setIconImage(mineIcon.getImage());
 
@@ -45,7 +47,7 @@ class View extends JFrame {
         JPanel pane = new JPanel(new BorderLayout());
         frame.setContentPane(pane);
 
-        // Create Menu
+        
         JMenuBar menuBar = new JMenuBar();
 
         JMenu gameMenu = new JMenu("Game");
@@ -76,23 +78,14 @@ class View extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Options option = new Options(View.this);
 				option.setVisible(true);
-				if (option.isClickedOK())
-				{
-					System.out.println("beginer");
-						Level lv = option.getLevel();
-						System.out.println(row+","+col+","+mines);
-						row= Integer.parseInt(lv.getWidth());
-						col= Integer.parseInt(lv.getHeight());
-						mines= Integer.parseInt(lv.getNumOfMines());
-						updateGUI();
-				}
 				//option.dispose();
 			}
         });
         gameMenu.addSeparator();
         gameMenu.add(exitItem);
+        
+   
 
         JPanel gridPane = new JPanel(new GridBagLayout());
 
@@ -103,8 +96,16 @@ class View extends JFrame {
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
 
-        buttons = new JButton[row][col];
 
+		Level lv = option.getLevel();
+		System.out.println(row+","+col+","+mines);
+		row= Integer.parseInt(lv.getWidth());
+		col= Integer.parseInt(lv.getHeight());
+		mines= Integer.parseInt(lv.getNumOfMines());
+		option.getLevel();
+		updateGUI();
+
+        buttons = new JButton[row][col];
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 buttons[i][j] = new JButton();

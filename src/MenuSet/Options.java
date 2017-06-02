@@ -1,3 +1,4 @@
+package MenuSet;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -44,7 +45,7 @@ public class Options extends JFrame {
 	private JButton btnCancel;
 	
 	private boolean clickedOK;
-	private Level level= new Level();
+	private Level level;
 	
 	public Options(View view) {
 		setTitle("Option");
@@ -167,39 +168,47 @@ public class Options extends JFrame {
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				clickedOK = true;
 				if(btnbeginner.isSelected()){
 					System.out.println("beginer");
 					level.setNumOfMines("30");
 					level.setHeight("9");
-					level.setWidth("9");		
+					level.setWidth("9");	
+					getLevel();
+					clickedOK = true;
 				}
 				else if(btnInter.isSelected()){
+					System.out.println("intermediate");
+
 					level.setNumOfMines("40");
 					level.setHeight("16");
 					level.setWidth("16");	
+					clickedOK = true;
 				}
 				else if(btnAdv.isSelected()){
+					System.out.println("advanced");
+
 					level.setNumOfMines("99");
 					level.setHeight("30");
 					level.setWidth("16");	
 				}
 				else if(btnCustom.isSelected()){
+					System.out.println("custom");
+
 					level.setNumOfMines(txtFieldMines.getText().trim());
 					level.setHeight(txtFieldHeight.getText().trim());
 					level.setWidth(txtFieldWidth.getText().trim());		
+					clickedOK = true;
 				}
 				else{
-					level.setNumOfMines("30");
-					level.setHeight("9");
-					level.setWidth("9");
+					clickedOK = false;
 				}
-				
+		
 				setVisible(false);
 			}
 		});
 		btnOK.setActionCommand("OK");
 		contentPane.add(btnOK);
+		getRootPane().setDefaultButton(btnOK);
 		
 		btnCancel = new JButton("Cancel");
 		btnCancel.setBounds(444, 419, 105, 27);
@@ -215,12 +224,16 @@ public class Options extends JFrame {
 		btnCancel.setActionCommand("Cancel");
 		contentPane.add(btnCancel);
 		
+		level = new Level();
 		clickedOK =false;
 	}
+	
 	public boolean isClickedOK()
 	{
+	
 		return clickedOK;
 	}
+	
 	public Level getLevel() {
 		System.out.println("pass getlevel");
 		return level;
