@@ -14,7 +14,7 @@ import javax.swing.JButton;
 
 @SuppressWarnings("serial")
 public class Options extends JFrame {
-
+//JDialog
 	private JPanel contentPane;
 	private JLabel lblTitle;
 	private JPanel panel;
@@ -170,40 +170,39 @@ public class Options extends JFrame {
 			{
 				if(btnbeginner.isSelected()){
 					System.out.println("beginer");
-					level.setNumOfMines("30");
-					level.setHeight("9");
-					level.setWidth("9");	
-					getLevel();
+					level.setNumOfMines(30);
+					level.setHeight(9);
+					level.setWidth(9);	
 					clickedOK = true;
 				}
 				else if(btnInter.isSelected()){
 					System.out.println("intermediate");
-
-					level.setNumOfMines("40");
-					level.setHeight("16");
-					level.setWidth("16");	
+					level.setNumOfMines(40);
+					level.setHeight(16);
+					level.setWidth(16);	
 					clickedOK = true;
 				}
 				else if(btnAdv.isSelected()){
 					System.out.println("advanced");
 
-					level.setNumOfMines("99");
-					level.setHeight("30");
-					level.setWidth("16");	
+					level.setNumOfMines(99);
+					level.setHeight(30);
+					level.setWidth(16);	
+					clickedOK = true;
 				}
 				else if(btnCustom.isSelected()){
 					System.out.println("custom");
 
-					level.setNumOfMines(txtFieldMines.getText().trim());
-					level.setHeight(txtFieldHeight.getText().trim());
-					level.setWidth(txtFieldWidth.getText().trim());		
+					level.setNumOfMines(Integer.parseInt(txtFieldMines.getText()));
+					level.setHeight(Integer.parseInt(txtFieldHeight.getText()));
+					level.setWidth(Integer.parseInt(txtFieldWidth.getText()));		
 					clickedOK = true;
 				}
 				else{
 					clickedOK = false;
 				}
 		
-				setVisible(false);
+				//dispose();
 			}
 		});
 		btnOK.setActionCommand("OK");
@@ -217,7 +216,6 @@ public class Options extends JFrame {
 			public void actionPerformed(ActionEvent e)
 			{
 				clickedOK = false;
-				setVisible(false);
 				dispose();
 			}
 		});

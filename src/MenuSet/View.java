@@ -26,7 +26,8 @@ class View extends JFrame {
     private int col=5;
     private int mines=3;
 	Options option = new Options(View.this);
-	private boolean isuesed;
+	private Level level;
+	
 	
     View() {
         try {
@@ -79,6 +80,15 @@ class View extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				option.setVisible(true);
+				if(option.isClickedOK()){
+					level = option.getLevel();
+					row= level.getWidth();
+					col= level.getHeight();
+					mines= level.getNumOfMines();
+					System.out.println(row+","+col+","+mines);
+					updateGUI();		
+				}
+				
 				//option.dispose();
 			}
         });
@@ -95,15 +105,6 @@ class View extends JFrame {
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
-
-
-		Level lv = option.getLevel();
-		System.out.println(row+","+col+","+mines);
-		row= Integer.parseInt(lv.getWidth());
-		col= Integer.parseInt(lv.getHeight());
-		mines= Integer.parseInt(lv.getNumOfMines());
-		option.getLevel();
-		updateGUI();
 
         buttons = new JButton[row][col];
         for (int i = 0; i < row; i++) {
@@ -130,8 +131,6 @@ class View extends JFrame {
 		revalidate();
 		repaint();
 	}
-
-
 
 	private <T> void notifyListeners(final BiConsumer<ViewListener, T> consumer, final T data) {
         for (final ViewListener listener : listeners) {

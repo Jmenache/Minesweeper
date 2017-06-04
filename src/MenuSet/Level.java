@@ -1,35 +1,35 @@
 package MenuSet;
 
 public class Level {
-	private String numOfMines;
-	private String height;
-	private String width;
+	private int numOfMines;
+	private int height;
+	private int width;
 	
 	public Level() {
-		this("","","");
+		this(5,5,5);
 	}
 	
-	public Level(String num, String h, String w) {
+	public Level(int num, int h, int w) {
 		this.numOfMines=num;
 		this.height=h;
 		this.width=w;
 	}
-	public String getNumOfMines() {
+	public int getNumOfMines() {
 		return numOfMines;
 	}
-	public void setNumOfMines(String numOfMines) {
+	public void setNumOfMines(int numOfMines) {
 		this.numOfMines = numOfMines;
 	}
-	public String getHeight() {
+	public int getHeight() {
 		return height;
 	}
-	public void setHeight(String height) {
+	public void setHeight(int height) {
 		this.height = height;
 	}
-	public String getWidth() {
+	public int getWidth() {
 		return width;
 	}
-	public void setWidth(String width) {
+	public void setWidth(int width) {
 		this.width = width;
 	}
 
