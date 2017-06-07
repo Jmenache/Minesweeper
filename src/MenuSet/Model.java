@@ -1,3 +1,4 @@
+package MenuSet;
 import java.util.Random;
 
 /**
@@ -41,9 +42,8 @@ class Model {
                                 mines[i][j]++;
 
     }
-    public void printMap() {
-
-
+    
+    void printMap() {
         System.out.println("This is the bomb map: ");
         for(int i = 0; i < rows; i++) {
             for(int j = 0; j < columns; j++) {
