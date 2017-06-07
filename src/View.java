@@ -1,7 +1,8 @@
+import com.sun.istack.internal.Nullable;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.io.FileWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
@@ -16,8 +17,13 @@ class View {
 
     private final ArrayList<ViewListener> listeners;
 
+    private final GridBagConstraints c;
+
     private final JFrame frame;
     private final JButton[][] buttons;
+    private final JPanel gridPane;
+
+    private final JLabel threeLabel;
 
     View() {
         try {
@@ -53,6 +59,7 @@ class View {
         StatisticsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
         OptionsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 
+        newGameItem.addActionListener(event -> notifyListeners(ViewListener::onNewGame, event));
         exitItem.addActionListener(event -> notifyListeners(ViewListener::onExit, event));
 
         // Add Menu
@@ -68,11 +75,11 @@ class View {
         gameMenu.addSeparator();
         gameMenu.add(exitItem);
 
-        JPanel gridPane = new JPanel(new GridBagLayout());
+        gridPane = new JPanel(new GridBagLayout());
 
         pane.add(gridPane, BorderLayout.CENTER);
 
-        GridBagConstraints c = new GridBagConstraints();
+        c = new GridBagConstraints();
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
@@ -92,6 +99,10 @@ class View {
         pane.add(button, BorderLayout.SOUTH);
 
 
+        URL threeIconURL = getClass().getResource("images/200px-Minesweeper_3.svg.png");
+        ImageIcon threeIcon = new ImageIcon(threeIconURL);
+        threeLabel  = new JLabel(threeIcon);
+
         this.listeners = new ArrayList<>();
         frame.setVisible(true);
     }
@@ -108,7 +119,25 @@ class View {
         listeners.add(listener);
     }
 
-    public JFrame getFrame() {
+    void addToGrid(int x, int y, JComponent component) {
+        c.gridx = x;
+        c.gridy = y;
+        gridPane.add(component, c);
+    }
+
+    JFrame getFrame() {
         return frame;
+    }
+
+    public JButton[][] getButtons() {
+        return buttons;
+    }
+
+    public JPanel getGridPane() {
+        return gridPane;
+    }
+
+    public JLabel getThreeLabel() {
+        return threeLabel;
     }
 }

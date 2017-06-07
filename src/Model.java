@@ -5,9 +5,9 @@ import java.util.Random;
  */
 class Model {
     private int[][] mines;
-    private int rows;
-    private int columns;
-    private int nbrBombs;
+    private int rows = 9;
+    private int columns = 9;
+    private int nbrBombs = 10;
 
     private Random rand = new Random();
 
@@ -41,7 +41,9 @@ class Model {
                                 mines[i][j]++;
 
     }
-    void printMap() {
+    public void printMap() {
+
+
         System.out.println("This is the bomb map: ");
         for(int i = 0; i < rows; i++) {
             for(int j = 0; j < columns; j++) {
