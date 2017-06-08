@@ -1,10 +1,11 @@
-package MenuSet;
+package game;
+
 import java.util.Random;
 
 /**
- * Model Class
+ * game.GameModel Class
  */
-class Model {
+public class GameModel {
     private int[][] mines;
     private int rows = 9;
     private int columns = 9;

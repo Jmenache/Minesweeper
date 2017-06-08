@@ -1,42 +1,45 @@
-package MenuSet;
-import com.sun.istack.internal.Nullable;
+package game;
 
+import options.OptionsModel;
+import options.OptionsView;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 
 /**
- * View Class
+ * game.GameView Class
  */
 @SuppressWarnings("serial")
-class View extends JFrame {
+public class GameView extends JFrame {
     private static final String TITLE = "Minesweeper";
 
     private static final int WIDTH = 400, HEIGHT = 500;
 
-    private final ArrayList<ViewListener> listeners;
+    private final ArrayList<GameViewListener> listeners;
 
     private final GridBagConstraints c;
 
     private final JFrame frame;
     private final JButton[][] buttons;
     private final JPanel gridPane;
-    private int row=5;
-    private int col=5;
-    private int mines=3;
-	Options option = new Options(View.this);
-	private Level level;
+    private int row = 9;
+    private int col = 9;
+    private int mines = 10;
+	private OptionsView optionsView = new OptionsView();
+	private OptionsModel optionsModel;
 
-    private final JLabel threeLabel;
+    // private final JLabel threeLabel;
 	
-    View() {
+    public GameView() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
@@ -58,20 +61,20 @@ class View extends JFrame {
         // Create Menu
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu gameMenu = new JMenu("Game");
+        JMenu gameMenu = new JMenu("game");
         JMenu helpMenu = new JMenu("?");
 
-        JMenuItem newGameItem = new JMenuItem("New Game");
+        JMenuItem newGameItem = new JMenuItem("New game");
         JMenuItem StatisticsItem  = new JMenuItem("Statistics");
-        JMenuItem OptionsItem  = new JMenuItem("Options");
+        JMenuItem OptionsItem  = new JMenuItem("options");
         JMenuItem exitItem = new JMenuItem("Exit");
 
         newGameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
         StatisticsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
         OptionsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
 
-        newGameItem.addActionListener(event -> notifyListeners(ViewListener::onNewGame, event));
-        exitItem.addActionListener(event -> notifyListeners(ViewListener::onExit, event));
+        newGameItem.addActionListener(event -> notifyListeners(GameViewListener::onNewGame, event));
+        exitItem.addActionListener(event -> notifyListeners(GameViewListener::onExit, event));
 
         // Add Menu
         pane.add(menuBar, BorderLayout.NORTH);
@@ -83,22 +86,18 @@ class View extends JFrame {
         gameMenu.addSeparator();
         gameMenu.add(StatisticsItem);
         gameMenu.add(OptionsItem);
-        OptionsItem.addActionListener(new ActionListener(){
+        OptionsItem.addActionListener(e -> {
+            optionsView.setVisible(true);
+            if(optionsView.isClickedOK()){
+                optionsModel = optionsView.getOptionsModel();
+                row= optionsModel.getWidth();
+                col= optionsModel.getHeight();
+                mines= optionsModel.getNumOfMines();
+                System.out.println(row+","+col+","+mines);
+                updateGUI();
+            }
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				option.setVisible(true);
-				if(option.isClickedOK()){
-					level = option.getLevel();
-					row= level.getWidth();
-					col= level.getHeight();
-					mines= level.getNumOfMines();
-					System.out.println(row+","+col+","+mines);
-					updateGUI();		
-				}
-				
-				//option.dispose();
-			}
+            //optionsView.dispose();
         });
         gameMenu.addSeparator();
         gameMenu.add(exitItem);
@@ -113,30 +112,49 @@ class View extends JFrame {
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
 
+
         buttons = new JButton[row][col];
+        URL threeIconURL = getClass().getResource("/images/200px-Minesweeper_unopened_square.svg.png");
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(threeIconURL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Image dimg = null;
+        if (img != null) {
+            dimg = img.getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        }
+        ImageIcon threeIcon = null;
+        if (dimg != null) {
+            threeIcon = new ImageIcon(dimg);
+        }
+        // ImageIcon threeIcon = new ImageIcon(threeIconURL);
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
-                buttons[i][j] = new JButton();
+                buttons[i][j] = new JButton(/*threeIcon*/);
                 c.gridx = i;
                 c.gridy = j;
+
+                // threeLabel.setSize(buttons[i][j].getSize());
+                // threeLabel.setMinimumSize(buttons[i][j].getMinimumSize());
+                // threeLabel.setMaximumSize(buttons[i][j].getMaximumSize());
+                // threeLabel.setPreferredSize(buttons[i][j].getPreferredSize());
                 gridPane.add(buttons[i][j], c);
+                // buttons[i][j].setVisible(false);
             }
         }
 
         JButton button = new JButton("lol");
         pane.add(button, BorderLayout.SOUTH);
 
-        URL threeIconURL = getClass().getResource("/images/200px-Minesweeper_3.svg.png");
-        ImageIcon threeIcon = new ImageIcon(threeIconURL);
-        threeLabel  = new JLabel(threeIcon);
-
         this.listeners = new ArrayList<>();
         frame.setVisible(true);
     }
 
 
-    private <T> void notifyListeners(final BiConsumer<ViewListener, T> consumer, final T data) {
-        for (final ViewListener listener : listeners) {
+    private <T> void notifyListeners(final BiConsumer<GameViewListener, T> consumer, final T data) {
+        for (final GameViewListener listener : listeners) {
             consumer.accept(listener, data);
         }
     }
@@ -147,7 +165,7 @@ class View extends JFrame {
 		repaint();
 	}
 
-    void addListener(final ViewListener listener) {
+    void addListener(final GameViewListener listener) {
         listeners.add(listener);
     }
 
@@ -169,7 +187,7 @@ class View extends JFrame {
         return gridPane;
     }
 
-    public JLabel getThreeLabel() {
-        return threeLabel;
-    }
+    // public JLabel getThreeLabel() {
+    //     return threeLabel;
+    // }
 }

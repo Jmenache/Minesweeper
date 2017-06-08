@@ -1,10 +1,11 @@
-package MenuSet;
+package game;
+
 import java.awt.event.ActionEvent;
 
 /**
- * ViewListener Interface
+ * game.GameViewListener Interface
  */
-public interface ViewListener {
+public interface GameViewListener {
     void onNewGame(ActionEvent event);
     void onExit(ActionEvent event);
 }
