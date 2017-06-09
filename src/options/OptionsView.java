@@ -41,7 +41,7 @@ public class OptionsView extends JFrame {
 	private OptionsModel optionsModel;
 	
 	public OptionsView() {
-		setTitle("Option");
+		setTitle("Options");
 		setAutoRequestFocus(false);
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

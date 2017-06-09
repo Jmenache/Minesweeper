@@ -8,46 +8,45 @@ import java.util.Random;
 public class GameModel {
     private int[][] mines;
     private int rows = 9;
-    private int columns = 9;
+    private int cols = 9;
     private int nbrBombs = 10;
 
     private Random rand = new Random();
 
     private String difficulty = "beginner";
+    private boolean firstOpen = true;
 
     public String getDifficulty() {
         return difficulty;
     }
 
-    public void generateMines() {
-        mines = new int[rows][columns];
+    void generateMines(int safeRow, int safeCol) {
+        mines = new int[rows][cols];
 
         int temp = 0;
-        int randomRow;
-        int randomColumn;
         while (temp < nbrBombs) {
-            randomRow = rand.nextInt(rows);
-            randomColumn = rand.nextInt(columns);
-            if (mines[randomRow][randomColumn] != -1) {
-                mines[randomColumn][randomRow] = -1;
+            int randomRow = rand.nextInt(rows);
+            int randomCol = rand.nextInt(cols);
+            if (mines[randomRow][randomCol] != -1 && (randomRow != safeRow || randomCol != safeCol)) {
+                mines[randomRow][randomCol] = -1;
                 temp++;
             }
         }
 
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < columns; j++)
-                if (mines[i][j] == 0)
-                    for (int nearRow = i - 1; nearRow <= i + 1; nearRow++)
-                        for (int nearColumn = j - 1; nearColumn <= j + 1; nearColumn++)
-                            if (nearRow >= 0 && nearRow < rows && nearColumn >= 0 && nearColumn < columns && mines[nearRow][nearColumn] == -1)
-                                mines[i][j]++;
+        for (int row = 0; row < rows; row++)
+            for (int col = 0; col < cols; col++)
+                if (mines[row][col] == 0)
+                    for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
+                        for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
+                            if (nearRow >= 0 && nearRow < rows && nearCol >= 0 && nearCol < cols && mines[nearRow][nearCol] == -1)
+                                mines[row][col]++;
 
     }
     
     void printMap() {
         System.out.println("This is the bomb map: ");
         for(int i = 0; i < rows; i++) {
-            for(int j = 0; j < columns; j++) {
+            for(int j = 0; j < cols; j++) {
                 if (mines[i][j] == -1){
                     System.out.printf("%5s", "*");
                 } else if (mines[i][j] == 0) {
@@ -58,5 +57,25 @@ public class GameModel {
             }
             System.out.println();
         }
+    }
+
+    int[][] getMines() {
+        return mines;
+    }
+
+    int getRows() {
+        return rows;
+    }
+
+    int getColumns() {
+        return cols;
+    }
+
+    boolean isFirstOpen() {
+        return firstOpen;
+    }
+
+    void setFirstOpen(boolean firstOpen) {
+        this.firstOpen = firstOpen;
     }
 }

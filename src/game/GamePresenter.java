@@ -3,11 +3,7 @@ package game;
 import options.OptionsModel;
 import options.OptionsView;
 
-import javax.swing.text.View;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * game.GamePresenter Class
@@ -29,16 +25,13 @@ public class GamePresenter implements GameViewListener {
     @Override
     public void onNewGame(ActionEvent event) {
         System.out.println("New game");
-        // gameModel.generateMines();
-        // gameModel.printMap();
-
-        // gameView.getButtons()[0][0].setVisible(false);
-
-        // gameView.getGridPane().remove(0);
-        // gameView.getGridPane().remove(gameView.getButtons()[0][0]);
-        // gameView.getButtons()[0][0].removeAll();
-
-        // gameView.addToGrid(0, 0, gameView.getThreeLabel());
+        for (int row = 0; row < gameModel.getRows(); row++) {
+            for (int col = 0; col < gameModel.getColumns(); col++) {
+                gameView.getButtons()[row][col].setEnabled(true);
+            }
+        }
+        gameModel.setFirstOpen(true);
+        gameView.updateGUI();
     }
 
     @Override
@@ -56,13 +49,60 @@ public class GamePresenter implements GameViewListener {
     @Override
     public void onExit(ActionEvent event) {
         gameView.getFrame().dispose();
-        //gameView.getFrame().dispatchEvent(new WindowEvent(gameView.getFrame(), WindowEvent.WINDOW_CLOSING));
+        // gameView.getFrame().dispatchEvent(new WindowEvent(gameView.getFrame(), WindowEvent.WINDOW_CLOSING));
     }
 
     @Override
     public void onOpenSquare(int[] coordinates) {
-        System.out.println("Open Square");
-        gameView.getButtons()[coordinates[0]][coordinates[1]].setIcon(gameView.getThreeIcon());
+        int row = coordinates[0];
+        int col = coordinates[1];
+        if(gameModel.isFirstOpen()) {
+            gameModel.generateMines(row, col);
+            gameView.mapIcons(gameModel.getMines());
+            gameModel.setFirstOpen(false);
+            // gameModel.printMap();
+        }
+        switch (gameModel.getMines()[row][col]) {
+            case 0:
+                openEmpty(row, col);
+                break;
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                gameView.getButtons()[row][col].setEnabled(false);
+                break;
+            case -1:
+                gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
+                for (int r = 0; r < gameModel.getRows(); r++)
+                    for (int c = 0; c < gameModel.getColumns(); c++)
+                        if (gameView.getButtons()[r][c].isEnabled()) {
+                            if (gameModel.getMines()[r][c] != -1) {
+                                gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
+                            }
+                            gameView.getButtons()[r][c].setEnabled(false);
+                        }
+                break;
+        }
         gameView.updateGUI();
+    }
+
+    private void openEmpty(int row, int col) {
+        for (int nearRow = row - 1; nearRow <= row + 1; nearRow++) {
+            for (int nearCol = col - 1; nearCol <= col + 1; nearCol++) {
+                if (nearRow >= 0 && nearRow < gameModel.getRows() && nearCol >= 0 && nearCol < gameModel.getColumns()) {
+                    if (gameModel.getMines()[nearRow][nearCol] != -1 && gameView.getButtons()[nearRow][nearCol].isEnabled()) {
+                        gameView.getButtons()[nearRow][nearCol].setEnabled(false);
+                        if (gameModel.getMines()[nearRow][nearCol] == 0) {
+                            openEmpty(nearRow, nearCol);
+                        }
+                    }
+                }
+            }
+        }
     }
 }

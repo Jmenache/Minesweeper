@@ -6,11 +6,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 
@@ -21,17 +18,16 @@ import java.util.function.BiConsumer;
 public class GameView extends JFrame {
     private static final String TITLE = "Minesweeper";
     private static final int WIDTH = 400, HEIGHT = 500;
-
     private final ArrayList<GameViewListener> listeners;
 
     private final GridBagConstraints c;
 
     private final JFrame frame;
-    private final JPanel pane;
+
     private final JButton[][] buttons;
     private final JPanel gridPane;
-
     private final static String ZERO_URL = "/images/200px-Minesweeper_0.svg.png";
+
     private final static String ONE_URL = "/images/200px-Minesweeper_1.svg.png";
     private final static String TWO_URL = "/images/200px-Minesweeper_2.svg.png";
     private final static String THREE_URL = "/images/200px-Minesweeper_3.svg.png";
@@ -41,10 +37,11 @@ public class GameView extends JFrame {
     private final static String SEVEN_URL = "/images/200px-Minesweeper_7.svg.png";
     private final static String EIGHT_URL = "/images/200px-Minesweeper_8.svg.png";
     private final static String FLAG_URL = "/images/200px-Minesweeper_flag.svg.png";
-    private final static String QUESTION_MARK_URL = "/images/200px-Minesweeper_questionmark.svg.png";
+    private final static String QUESTION_MARK_URL = "/images/200px-Minesweeper_questionMark.svg.png";
     private final static String UNOPENED_URL = "/images/200px-Minesweeper_unopened_square.svg.png";
+    private final static String MINE_URL = "/images/mineIcon.png";
+    private static final String EXPLODED_MINE_URL = "/images/1200x630bb.jpg";
 
-    // private final JLabel threeLabel;
     private ImageIcon zeroIcon;
     private ImageIcon oneIcon;
     private ImageIcon twoIcon;
@@ -57,6 +54,8 @@ public class GameView extends JFrame {
     private ImageIcon flagIcon;
     private ImageIcon questionMarkIcon;
     private ImageIcon unopenedIcon;
+    private ImageIcon mineIcon;
+    private ImageIcon explodedMineIcon;
 
     public GameView() {
         // Define Look and Feel
@@ -76,7 +75,7 @@ public class GameView extends JFrame {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
-        pane = new JPanel(new BorderLayout());
+        JPanel pane = new JPanel(new BorderLayout());
         frame.setContentPane(pane);
 
         // Create Menu
@@ -121,8 +120,9 @@ public class GameView extends JFrame {
         c.fill = GridBagConstraints.BOTH;
 
         initIcons();
-        buttons = new JButton[9][9];
-        createGrid(9, 9);
+        int rowAndCol = 9;
+        buttons = new JButton[rowAndCol][rowAndCol];
+        createGrid(rowAndCol, rowAndCol);
 
         // Create South Border
         JButton button = new JButton("lol");
@@ -146,6 +146,8 @@ public class GameView extends JFrame {
         flagIcon = initIcon(FLAG_URL);
         questionMarkIcon = initIcon(QUESTION_MARK_URL);
         unopenedIcon = initIcon(UNOPENED_URL);
+        mineIcon = initIcon(MINE_URL);
+        explodedMineIcon = initIcon(EXPLODED_MINE_URL);
     }
 
     private ImageIcon initIcon(String address) {
@@ -170,6 +172,12 @@ public class GameView extends JFrame {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 buttons[row][col] = new JButton(unopenedIcon);
+                buttons[row][col].setSelectedIcon(unopenedIcon);
+                buttons[row][col].setPressedIcon(unopenedIcon);
+                buttons[row][col].setBorderPainted(false);
+                buttons[row][col].setFocusPainted(false);
+                buttons[row][col].setRolloverEnabled(false);
+
                 int[] coordinates = {row, col};
                 buttons[row][col].addActionListener(event -> notifyListeners(GameViewListener::onOpenSquare, coordinates));
 
@@ -191,7 +199,7 @@ public class GameView extends JFrame {
         }
     }
 
-	public void updateGUI() {
+	void updateGUI() {
 		revalidate();
 		repaint();
 	}
@@ -200,37 +208,58 @@ public class GameView extends JFrame {
         listeners.add(listener);
     }
 
-    void addToGrid(int x, int y, JComponent component) {
-        c.gridx = x;
-        c.gridy = y;
-        gridPane.add(component, c);
-    }
-
-    public JFrame getFrame() {
+    JFrame getFrame() {
         return frame;
     }
 
-    public JButton[][] getButtons() {
+    JButton[][] getButtons() {
         return buttons;
     }
 
-    public JPanel getGridPane() {
-        return gridPane;
+    ImageIcon getUnopenedIcon() {
+        return unopenedIcon;
     }
 
-    public ImageIcon getThreeIcon() {
-        return threeIcon;
+    ImageIcon getExplodedMineIcon() {
+        return explodedMineIcon;
     }
 
-    public void setUnopenedIcon(ImageIcon unopenedIcon) {
-        this.unopenedIcon = unopenedIcon;
+    void mapIcons(int[][] mines) {
+        for (int row = 0; row < mines.length; row++) {
+            for (int col = 0; col < mines[row].length; col++) {
+                switch (mines[row][col]) {
+                    case 0:
+                        buttons[row][col].setDisabledIcon(zeroIcon);
+                        break;
+                    case 1:
+                        buttons[row][col].setDisabledIcon(oneIcon);
+                        break;
+                    case 2:
+                        buttons[row][col].setDisabledIcon(twoIcon);
+                        break;
+                    case 3:
+                        buttons[row][col].setDisabledIcon(threeIcon);
+                        break;
+                    case 4:
+                        buttons[row][col].setDisabledIcon(fourIcon);
+                        break;
+                    case 5:
+                        buttons[row][col].setDisabledIcon(fiveIcon);
+                        break;
+                    case 6:
+                        buttons[row][col].setDisabledIcon(sixIcon);
+                        break;
+                    case 7:
+                        buttons[row][col].setDisabledIcon(sevenIcon);
+                        break;
+                    case 8:
+                        buttons[row][col].setDisabledIcon(eightIcon);
+                        break;
+                    case -1:
+                        buttons[row][col].setDisabledIcon(mineIcon);
+                        break;
+                }
+            }
+        }
     }
-
-    public void setThreeIcon(ImageIcon threeIcon) {
-        this.threeIcon = threeIcon;
-    }
-
-    // public JLabel getThreeLabel() {
-    //     return threeLabel;
-    // }
 }
