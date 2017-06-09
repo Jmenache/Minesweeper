@@ -1,6 +1,13 @@
 package game;
 
+import options.OptionsModel;
+import options.OptionsView;
+
+import javax.swing.text.View;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * game.GamePresenter Class
@@ -8,6 +15,9 @@ import java.awt.event.ActionEvent;
 public class GamePresenter implements GameViewListener {
     private final GameView gameView;
     private final GameModel gameModel;
+
+    private OptionsView optionsView = new OptionsView();
+    private OptionsModel optionsModel;
 
 
     public GamePresenter(final GameView gameView, final GameModel gameModel) {
@@ -32,8 +42,27 @@ public class GamePresenter implements GameViewListener {
     }
 
     @Override
+    public void onOptions(ActionEvent event) {
+        optionsView.setVisible(true);
+        if(optionsView.isClickedOK()){
+            optionsModel = optionsView.getOptionsModel();
+            System.out.println(optionsModel.getWidth() + "," + optionsModel.getHeight() + "," + optionsModel.getNumOfMines());
+            gameView.updateGUI();
+        }
+
+        //optionsView.dispose();
+    }
+
+    @Override
     public void onExit(ActionEvent event) {
         gameView.getFrame().dispose();
         //gameView.getFrame().dispatchEvent(new WindowEvent(gameView.getFrame(), WindowEvent.WINDOW_CLOSING));
+    }
+
+    @Override
+    public void onOpenSquare(int[] coordinates) {
+        System.out.println("Open Square");
+        gameView.getButtons()[coordinates[0]][coordinates[1]].setIcon(gameView.getThreeIcon());
+        gameView.updateGUI();
     }
 }
