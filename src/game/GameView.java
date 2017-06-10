@@ -2,12 +2,16 @@ package game;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.function.BiConsumer;
 
 
@@ -113,6 +117,7 @@ public class GameView extends JFrame {
 
         // Create grid
         gridPane = new JPanel(new GridBagLayout());
+        gridPane.setBackground(Color.black);
         pane.add(gridPane, BorderLayout.CENTER);
         c = new GridBagConstraints();
         c.weightx = 1;
@@ -130,6 +135,8 @@ public class GameView extends JFrame {
 
         // Conclude view creation
         this.listeners = new ArrayList<>();
+        frame.pack();
+        frame.setResizable(false);
         frame.setVisible(true);
     }
 
@@ -175,11 +182,34 @@ public class GameView extends JFrame {
                 buttons[row][col].setSelectedIcon(unopenedIcon);
                 buttons[row][col].setPressedIcon(unopenedIcon);
                 buttons[row][col].setBorderPainted(false);
+                buttons[row][col].setBorder(null);
+                buttons[row][col].setFocusable(false);
+                buttons[row][col].setMargin(new Insets(0, 0, 0, 0));
+                buttons[row][col].setContentAreaFilled(false);
                 buttons[row][col].setFocusPainted(false);
                 buttons[row][col].setRolloverEnabled(false);
 
                 int[] coordinates = {row, col};
                 buttons[row][col].addActionListener(event -> notifyListeners(GameViewListener::onOpenSquare, coordinates));
+                buttons[row][col].addMouseListener(new MouseInputAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        super.mousePressed(e);
+                        // System.out.println(e.getComponent());
+                        if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 1) {
+                            buttons[coordinates[0]][coordinates[1]].isEnabled()
+                            if (buttons[coordinates[0]][coordinates[1]].isEnabled()) {
+                                buttons[coordinates[0]][coordinates[1]].setEnabled(false);
+                            } else {
+                                buttons[coordinates[0]][coordinates[1]].setEnabled(true);
+                            }
+                            // buttons[row][col].setDisabledIcon();
+                        }
+                        if (SwingUtilities.isMiddleMouseButton(e)) {
+                            System.out.println("lol2");
+                        }
+                    }
+                });
 
                 c.gridx = row;
                 c.gridy = col;
