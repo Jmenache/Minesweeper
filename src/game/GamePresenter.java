@@ -5,6 +5,7 @@ import Statistics.StatisticsView;
 import options.OptionsModel;
 import options.OptionsView;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -148,7 +149,12 @@ public class GamePresenter implements GameViewListener {
 
     private void firstOpen(int row, int col) {
         gameModel.generateMines(row, col);
+        Timer timer = new Timer( 1000, e -> {
+            gameModel.incrementTimer();
+            // gameView.updateTimer(gameModel.getTimer());
+        } );
         gameView.mapDisableIcons(gameModel.getMines());
+        timer.start();
         gameModel.setFirstOpen(false);
         // gameModel.printMap();
     }

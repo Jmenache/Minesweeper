@@ -1,5 +1,6 @@
 package game;
 
+import java.util.PrimitiveIterator;
 import java.util.Random;
 
 /**
@@ -18,6 +19,8 @@ public class GameModel {
     static final int OPENED = 1;
     static final int FLAGGED = 2;
     static final int QUESTION_MARKED = 3;
+
+    private int timer = 0;
 
     private int squareCount;
     private int mineCount;
@@ -95,6 +98,14 @@ public class GameModel {
 
     int[][] getButtonsState() {
         return buttonsState;
+    }
+
+    int getTimer() {
+        return timer;
+    }
+
+    void incrementTimer() {
+        timer++;
     }
 
     void incrementMineCount() {
