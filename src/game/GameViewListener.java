@@ -19,6 +19,5 @@ public interface GameViewListener{
     void onOpenSquare(int[] coordinates);
     void onTimerStart(ActionEvent actionEvent);
     void onRightClick(int[] coordinates);
-
     void onMiddleClick(int[] coordinates);
 }

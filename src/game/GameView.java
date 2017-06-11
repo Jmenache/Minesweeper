@@ -122,6 +122,8 @@ public class GameView extends JFrame {
         LoadItem.setAccelerator(KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK));
 
         newGameItem.addActionListener(event -> notifyListeners(GameViewListener::onNewGame, event));
+        OptionsItem.addActionListener(event -> notifyListeners(GameViewListener::onOptions, event));
+        StatisticsItem.addActionListener(event -> notifyListeners(GameViewListener::onStatistics, event));
         SaveItem.addActionListener(event -> notifyListeners(GameViewListener::onSaveGame, event));
         LoadItem.addActionListener(event -> notifyListeners(GameViewListener::onLoadGame, event));
         exitItem.addActionListener(event -> notifyListeners(GameViewListener::onExit, event));
@@ -133,11 +135,14 @@ public class GameView extends JFrame {
         menuBar.add(helpMenu);
 
         gameMenu.add(newGameItem);
+
         gameMenu.addSeparator();
         gameMenu.add(StatisticsItem);
-        StatisticsItem.addActionListener(event -> notifyListeners(GameViewListener::onStatistics, event));
         gameMenu.add(OptionsItem);
-        OptionsItem.addActionListener(event -> notifyListeners(GameViewListener::onOptions, event));
+
+        gameMenu.addSeparator();
+        gameMenu.add(SaveItem);
+        gameMenu.add(LoadItem);
 
         gameMenu.addSeparator();
         gameMenu.add(exitItem);
