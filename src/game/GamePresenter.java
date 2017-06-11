@@ -148,7 +148,7 @@ public class GamePresenter implements GameViewListener {
 
     @Override
     public void onLoadGame() {
-        
+
     }
 
     private void newGame() {
@@ -266,5 +266,9 @@ public class GamePresenter implements GameViewListener {
                 }
             }
         }
+    }
+
+    private void saveGame() {
+        
     }
 }
