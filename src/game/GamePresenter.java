@@ -6,6 +6,9 @@ import options.OptionsPresenter;
 import options.OptionsView;
 
 import java.awt.event.ActionEvent;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * game.GamePresenter Class
@@ -61,6 +64,39 @@ public class GamePresenter implements GameViewListener {
         }*/
 
         //optionsView.dispose();
+    }
+
+    @Override
+    public void onSaveGame(ActionEvent event) {
+        FileOutputStream saveObject = null;
+        try {
+            saveObject = new FileOutputStream("data.txt");
+            PrintWriter x = new PrintWriter(saveObject, true);
+
+            x.println("getMines");
+            for (int row = 0; row < optionsModel.getRows(); row++) {
+                for (int col = 0; col < optionsModel.getCols(); col++) {
+                    x.print(gameModel.getMines()[row][col] + " ");
+                }
+                x.println("");
+            }
+
+            x.println("getButtonsState");
+            for (int row = 0; row < optionsModel.getRows(); row++) {
+                for (int col = 0; col < optionsModel.getCols(); col++) {
+                    x.print(gameModel.getButtonsState()[row][col] + " ");
+                }
+                x.println("");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onLoadGame(ActionEvent event) {
+
     }
 
     @Override
@@ -152,11 +188,6 @@ public class GamePresenter implements GameViewListener {
                         }
             }
         }
-    }
-
-    @Override
-    public void onLoadGame() {
-
     }
 
     private void newGame() {
@@ -289,9 +320,5 @@ public class GamePresenter implements GameViewListener {
                 }
             }
         }
-    }
-
-    private void saveGame() {
-
     }
 }

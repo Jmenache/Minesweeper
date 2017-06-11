@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -110,13 +111,19 @@ public class GameView extends JFrame {
         JMenuItem newGameItem = new JMenuItem("New game");
         JMenuItem StatisticsItem  = new JMenuItem("Statistics");
         JMenuItem OptionsItem  = new JMenuItem("options");
+        JMenuItem SaveItem  = new JMenuItem("Save");
+        JMenuItem LoadItem  = new JMenuItem("Load");
         JMenuItem exitItem = new JMenuItem("Exit");
 
         newGameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
         StatisticsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
         OptionsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+        SaveItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_MASK));
+        LoadItem.setAccelerator(KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK));
 
         newGameItem.addActionListener(event -> notifyListeners(GameViewListener::onNewGame, event));
+        SaveItem.addActionListener(event -> notifyListeners(GameViewListener::onSaveGame, event));
+        LoadItem.addActionListener(event -> notifyListeners(GameViewListener::onLoadGame, event));
         exitItem.addActionListener(event -> notifyListeners(GameViewListener::onExit, event));
 
         // Add Menu
@@ -376,7 +383,7 @@ public class GameView extends JFrame {
         return victoryIcon;
     }
 
-    public JLabel getNumofmine() {
+    JLabel getNumofmine() {
         return numofmine;
     }
 
