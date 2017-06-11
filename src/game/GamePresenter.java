@@ -1,8 +1,8 @@
 package game;
 
-import Statistics.StatisticsModel;
 import Statistics.StatisticsView;
 import options.OptionsModel;
+import options.OptionsPresenter;
 import options.OptionsView;
 
 import javax.swing.*;
@@ -12,19 +12,19 @@ import java.awt.event.ActionEvent;
  * game.GamePresenter Class
  */
 public class GamePresenter implements GameViewListener {
-    private final GameView gameView;
+    private final OptionsModel optionsModel;
     private final GameModel gameModel;
+    private final GameView gameView;
 
     private StatisticsView statisticsView = new StatisticsView();
 
-    private OptionsView optionsView = new OptionsView();
-    private OptionsModel optionsModel;
 
+    public GamePresenter(final GameView gameView, final GameModel gameModel, final OptionsModel optionsModel) {
+        this.optionsModel = optionsModel;
 
-    public GamePresenter(final GameView gameView, final GameModel gameModel) {
+        this.gameModel = gameModel;
         this.gameView = gameView;
         gameView.addListener(this);
-        this.gameModel = gameModel;
 
         newGame();
     }
@@ -32,8 +32,8 @@ public class GamePresenter implements GameViewListener {
     @Override
     public void onNewGame(ActionEvent event) {
         newGame();
-        for (int row = 0; row < gameModel.getRows(); row++) {
-            for (int col = 0; col < gameModel.getCols(); col++) {
+        for (int row = 0; row < optionsModel.getRows(); row++) {
+            for (int col = 0; col < optionsModel.getCols(); col++) {
                 gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
                 gameView.getButtons()[row][col].setEnabled(true);
             }
@@ -49,12 +49,15 @@ public class GamePresenter implements GameViewListener {
 
     @Override
     public void onOptions(ActionEvent event) {
-        optionsView.setVisible(true);
+        OptionsView optionsView = new OptionsView();
+        new OptionsPresenter(optionsView, optionsModel);
+
+        /*optionsView.setVisible(true);
         if(optionsView.isClickedOK()) {
             optionsModel = optionsView.getOptionsModel();
-            System.out.println(optionsModel.getWidth() + "," + optionsModel.getHeight() + "," + optionsModel.getNumOfMines());
+            System.out.println(optionsModel.getCols() + "," + optionsModel.getRows() + "," + optionsModel.getNumberOfMines());
             gameView.updateGUI();
-        }
+        }*/
 
         //optionsView.dispose();
     }
@@ -63,6 +66,12 @@ public class GamePresenter implements GameViewListener {
     public void onExit(ActionEvent event) {
         gameView.getFrame().dispose();
         // gameView.getFrame().dispatchEvent(new WindowEvent(gameView.getFrame(), WindowEvent.WINDOW_CLOSING));
+    }
+
+    @Override
+    public void onCreateGrid(int i) {
+        // gameView.initiateButtons(optionsModel.getRows(), optionsModel.getCols());
+        // gameView.createGrid(optionsModel.getRows(), optionsModel.getCols());
     }
 
     @Override
@@ -93,7 +102,7 @@ public class GamePresenter implements GameViewListener {
                     gameModel.incrementMineCount();
                     gameView.mapDisableIcon(gameModel.getMines(), row, col);
                     gameView.getButtons()[row][col].setEnabled(true);
-                    if (gameModel.isQuestionMarkEnabled()) {
+                    if (optionsModel.isQuestionMarkEnabled()) {
                         gameView.getButtons()[row][col].setIcon(gameView.getQuestionMarkIcon());
                         gameModel.getButtonsState()[row][col] = GameModel.QUESTION_MARKED;
                     } else {
@@ -119,7 +128,7 @@ public class GamePresenter implements GameViewListener {
             int flagCount = 0;
             for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
                 for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
-                    if (nearRow >= 0 && nearRow < gameModel.getRows() && nearCol >= 0 && nearCol < gameModel.getCols()) {
+                    if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0 && nearCol < optionsModel.getCols()) {
                         if (gameModel.getButtonsState()[nearRow][nearCol] == GameModel.FLAGGED) {
                             flagCount++;
                         }
@@ -128,7 +137,7 @@ public class GamePresenter implements GameViewListener {
             if (gameModel.getMines()[row][col] == flagCount) {
                 for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
                     for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
-                        if (nearRow >= 0 && nearRow < gameModel.getRows() && nearCol >= 0 && nearCol < gameModel.getCols()) {
+                        if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0 && nearCol < optionsModel.getCols()) {
                             if (gameModel.getButtonsState()[nearRow][nearCol] != GameModel.FLAGGED && gameModel.getButtonsState()[nearRow][nearCol] != GameModel.OPENED) {
                                 openSquare(nearRow, nearCol);
                             }
@@ -140,15 +149,15 @@ public class GamePresenter implements GameViewListener {
     private void newGame() {
         System.out.println("New game");
 
-        gameModel.resetButtonState();
-        gameModel.setMineCount(gameModel.getNbrBombs());
-        gameModel.setSquareCount(gameModel.getRows() * gameModel.getCols());
-        gameModel.generateMines();
+        gameModel.resetButtonState(optionsModel.getRows(), optionsModel.getCols());
+        gameModel.setMineCount(optionsModel.getNumberOfMines());
+        gameModel.setSquareCount(optionsModel.getRows() * optionsModel.getCols());
+        initiateMines(optionsModel.getRows(), optionsModel.getCols());
         gameModel.setFirstOpen(true);
     }
 
     private void firstOpen(int row, int col) {
-        gameModel.generateMines(row, col);
+        generateMines(row, col);
         Timer timer = new Timer( 1000, e -> {
             gameModel.incrementTimer();
             // gameView.updateTimer(gameModel.getTimer());
@@ -159,6 +168,33 @@ public class GamePresenter implements GameViewListener {
         // gameModel.printMap();
     }
 
+    private void initiateMines(int rows, int cols) {
+        gameModel.initiateMines(rows, cols);
+    }
+
+    private void generateMines(int safeRow, int safeCol) {
+        gameModel.initiateMines(optionsModel.getRows(), optionsModel.getCols());
+
+        int minesPlaced = 0;
+        while (minesPlaced < optionsModel.getNumberOfMines()) {
+            int randomRow = gameModel.getRand().nextInt(optionsModel.getRows());
+            int randomCol = gameModel.getRand().nextInt(optionsModel.getCols());
+            if (gameModel.getMines()[randomRow][randomCol] != GameModel.MINE && (randomRow != safeRow || randomCol != safeCol)) {
+                gameModel.getMines()[randomRow][randomCol] = GameModel.MINE;
+                minesPlaced++;
+            }
+        }
+
+        for (int row = 0; row < optionsModel.getRows(); row++)
+            for (int col = 0; col < optionsModel.getCols(); col++)
+                if (gameModel.getMines()[row][col] == 0)
+                    for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
+                        for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
+                            if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0 && nearCol < optionsModel.getCols() && gameModel.getMines()[nearRow][nearCol] == GameModel.MINE)
+                                gameModel.getMines()[row][col]++;
+
+    }
+
     private void openSquare(int row, int col) {
         switch (gameModel.getMines()[row][col]) {
             case GameModel.EMPTY:
@@ -167,13 +203,15 @@ public class GamePresenter implements GameViewListener {
                 break;
             case GameModel.MINE:
                 gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
-                for (int r = 0; r < gameModel.getRows(); r++)
-                    for (int c = 0; c < gameModel.getCols(); c++)
+                for (int r = 0; r < optionsModel.getRows(); r++)
+                    for (int c = 0; c < optionsModel.getCols(); c++)
                         if (gameView.getButtons()[r][c].isEnabled()) {
                             if (gameModel.getMines()[r][c] != GameModel.MINE) {
                                 gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
                             }
                             gameView.getButtons()[r][c].setEnabled(false);
+                        } else if (gameModel.getButtonsState()[r][c] == GameModel.FLAGGED) {
+                            gameView.getButtons()[r][c].setDisabledIcon(gameView.getCrossedMineIcon());
                         }
                 break;
             default:
@@ -186,7 +224,7 @@ public class GamePresenter implements GameViewListener {
     private void openEmpty(int row, int col) {
         for (int nearRow = row - 1; nearRow <= row + 1; nearRow++) {
             for (int nearCol = col - 1; nearCol <= col + 1; nearCol++) {
-                if (nearRow >= 0 && nearRow < gameModel.getRows() && nearCol >= 0 && nearCol < gameModel.getCols()) {
+                if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0 && nearCol < optionsModel.getCols()) {
                     if (gameModel.getMines()[nearRow][nearCol] != GameModel.MINE)
                         if (gameView.getButtons()[nearRow][nearCol].isEnabled())
                             if (gameModel.getButtonsState()[nearRow][nearCol] != GameModel.FLAGGED) {
@@ -204,15 +242,19 @@ public class GamePresenter implements GameViewListener {
         gameView.getButtons()[row][col].setEnabled(false);
         gameModel.getButtonsState()[row][col] = GameModel.OPENED;
         gameModel.decrementSquareCount();
-        if (gameModel.wasLastEmptySquare()) gameWon();
+        if (wasLastEmptySquare()) gameWon();
 
+    }
+
+    private boolean wasLastEmptySquare() {
+        return gameModel.getSquareCount() - optionsModel.getNumberOfMines() == 0;
     }
 
     private void gameWon() {
         System.out.println("Game won");
 
-        for (int row = 0; row < gameModel.getRows(); row++) {
-            for (int col = 0; col < gameModel.getCols(); col++) {
+        for (int row = 0; row < optionsModel.getRows(); row++) {
+            for (int col = 0; col < optionsModel.getCols(); col++) {
                 if (gameModel.getMines()[row][col] == GameModel.MINE) {
                     gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
                     gameView.getButtons()[row][col].setEnabled(false);

@@ -1,14 +1,10 @@
 package Statistics;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.Choice;
-import java.awt.List;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class StatisticsView extends JFrame {
 
@@ -47,7 +43,7 @@ public class StatisticsView extends JFrame {
 	 * Create the frame.
 	 */
 	public StatisticsView() {
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 654, 296);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

@@ -13,6 +13,7 @@ public interface GameViewListener{
     void onExit(ActionEvent event);
 
     // Game
+    void onCreateGrid(int i);
     void onOpenSquare(int[] coordinates);
     void onRightClick(int[] coordinates);
     void onMiddleClick(int[] coordinates);

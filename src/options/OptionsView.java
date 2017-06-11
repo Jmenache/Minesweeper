@@ -1,12 +1,16 @@
 package options;
 
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-
-import java.awt.Checkbox;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.function.BiConsumer;
 
 @SuppressWarnings("serial")
 public class OptionsView extends JFrame {
+    private static final String TITLE = "Minesweeper";
+    private final ArrayList<OptionsViewListener> listeners;
 //JDialog
 	private JPanel contentPane;
 	private JLabel lblTitle;
@@ -41,10 +45,10 @@ public class OptionsView extends JFrame {
 	private OptionsModel optionsModel;
 	
 	public OptionsView() {
-		setTitle("Options");
+		setTitle(TITLE);
 		setAutoRequestFocus(false);
 		setAlwaysOnTop(true);
-		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 596, 511);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -160,32 +164,32 @@ public class OptionsView extends JFrame {
 		btnOK.addActionListener(e -> {
             if(btnbeginner.isSelected()){
                 System.out.println("beginner");
-                optionsModel.setNumOfMines(30);
-                optionsModel.setHeight(9);
-                optionsModel.setWidth(9);
+                optionsModel.setNumberOfMines(30);
+                optionsModel.setRows(9);
+                optionsModel.setCols(9);
                 clickedOK = true;
             }
             else if(btnInter.isSelected()){
                 System.out.println("intermediate");
-                optionsModel.setNumOfMines(40);
-                optionsModel.setHeight(16);
-                optionsModel.setWidth(16);
+                optionsModel.setNumberOfMines(40);
+                optionsModel.setRows(16);
+                optionsModel.setCols(16);
                 clickedOK = true;
             }
             else if(btnAdv.isSelected()){
                 System.out.println("advanced");
 
-                optionsModel.setNumOfMines(99);
-                optionsModel.setHeight(30);
-                optionsModel.setWidth(16);
+                optionsModel.setNumberOfMines(99);
+                optionsModel.setRows(30);
+                optionsModel.setCols(16);
                 clickedOK = true;
             }
             else if(btnCustom.isSelected()){
                 System.out.println("custom");
 
-                optionsModel.setNumOfMines(Integer.parseInt(txtFieldMines.getText()));
-                optionsModel.setHeight(Integer.parseInt(txtFieldHeight.getText()));
-                optionsModel.setWidth(Integer.parseInt(txtFieldWidth.getText()));
+                optionsModel.setNumberOfMines(Integer.parseInt(txtFieldMines.getText()));
+                optionsModel.setRows(Integer.parseInt(txtFieldHeight.getText()));
+                optionsModel.setCols(Integer.parseInt(txtFieldWidth.getText()));
                 clickedOK = true;
             }
             else{
@@ -209,6 +213,8 @@ public class OptionsView extends JFrame {
 		
 		optionsModel = new OptionsModel();
 		clickedOK =false;
+        this.listeners = new ArrayList<>();
+        setVisible(true);
 	}
 	
 	public boolean isClickedOK() {
@@ -218,5 +224,18 @@ public class OptionsView extends JFrame {
 	public OptionsModel getOptionsModel() {
 		System.out.println("pass getlevel");
 		return optionsModel;
+	}
+
+    private <T> void notifyListeners(final BiConsumer<OptionsViewListener, T> consumer, final T data) {
+        listeners.forEach(listener -> consumer.accept(listener, data));
+    }
+
+    void updateGUI() {
+        revalidate();
+        repaint();
+    }
+
+	void addListener(final OptionsViewListener listener) {
+		listeners.add(listener);
 	}
 }

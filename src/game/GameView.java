@@ -41,8 +41,14 @@ public class GameView extends JFrame {
     private final static String FLAG_URL = "/images/200px-Minesweeper_flag.svg.png";
     private final static String QUESTION_MARK_URL = "/images/200px-Minesweeper_questionMark.svg.png";
     private final static String UNOPENED_URL = "/images/200px-Minesweeper_unopened_square.svg.png";
-    private final static String MINE_URL = "/images/mineIcon.png";
+    private final static String FRAME_MINE_URL = "/images/mineIcon.png";
+    private final static String CROSSED_MINE_URL = "/images/crossedMine.jpg";
+    private final static String MINE_URL = "/images/mine.jpg";
     private static final String EXPLODED_MINE_URL = "/images/1200x630bb.jpg";
+    private static final String NEW_GAME_URL = "/images/newGame.png";
+    private static final String OPEN_SQUARE_URL = "/images/openSquare.png";
+    private static final String DEFEAT_URL = "/images/defeat.png";
+    private static final String VICTORY_URL = "/images/victory.png";
 
     private ImageIcon zeroIcon;
     private ImageIcon oneIcon;
@@ -56,8 +62,21 @@ public class GameView extends JFrame {
     private ImageIcon flagIcon;
     private ImageIcon questionMarkIcon;
     private ImageIcon unopenedIcon;
+    private ImageIcon frameMineIcon;
+    private ImageIcon crossedMineIcon;
     private ImageIcon mineIcon;
     private ImageIcon explodedMineIcon;
+    private ImageIcon newGameIcon;
+    private ImageIcon openSquareIcon;
+    private ImageIcon defeatIcon;
+    private ImageIcon victoryIcon;
+
+    private JPanel btmpan;
+    private JButton btnmine;
+    private JTextField timenum;
+    private JButton btnface;
+    private JTextField numofmine;
+    private JButton btnTime;
 
     public GameView() {
         // Define Look and Feel
@@ -71,7 +90,7 @@ public class GameView extends JFrame {
 
         // Create Frame
         frame = new JFrame(TITLE);
-        frame.setIconImage(mineIcon.getImage());
+        frame.setIconImage(frameMineIcon.getImage());
 
         // frame.setSize(WIDTH ,HEIGHT);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -125,11 +144,37 @@ public class GameView extends JFrame {
 
         int rowAndCol = 9;
         buttons = new JButton[rowAndCol][rowAndCol];
+        // notifyListeners(GameViewListener::onCreateGrid, 0);
         createGrid(rowAndCol, rowAndCol);
 
         // Create South Border
-        JButton button = new JButton("lol");
-        pane.add(button, BorderLayout.SOUTH);
+        btmpan = new JPanel();
+        btmpan.setLayout(new GridLayout());
+        pane.add(btmpan, BorderLayout.SOUTH);
+
+        btnmine = new JButton("mines");
+        btnmine.setEnabled(false);
+        // btnmine.setBounds(14, 5, 63, 27);
+        btmpan.add(btnmine);
+
+        timenum = new JTextField();
+        // timenum.setBounds(91, 6, 116, 24);
+        timenum.setColumns(4);
+        btmpan.add(timenum);
+
+        btnface = new JButton("Face");
+        // btnface.setBounds(284, 5, 65, 27);
+        btmpan.add(btnface);
+
+        numofmine = new JTextField();
+        // numofmine.setBounds(427, 6, 116, 24);
+        numofmine.setColumns(4);
+        btmpan.add(numofmine);
+
+        btnTime = new JButton("time");
+        btnTime.setEnabled(false);
+        // btnTime.setBounds(557, 5, 59, 27);
+        btmpan.add(btnTime);
 
         // Conclude view creation
         this.listeners = new ArrayList<>();
@@ -137,6 +182,10 @@ public class GameView extends JFrame {
         frame.setResizable(false);
         frame.setVisible(true);
     }
+
+    // void initiateButtons(int rows, int cols) {
+    //     buttons = new JButton[rows][cols];
+    // }
 
     private void initIcons() {
         zeroIcon = initIcon(ZERO_URL);
@@ -151,8 +200,15 @@ public class GameView extends JFrame {
         flagIcon = initIcon(FLAG_URL);
         questionMarkIcon = initIcon(QUESTION_MARK_URL);
         unopenedIcon = initIcon(UNOPENED_URL);
+        frameMineIcon = initIcon(FRAME_MINE_URL);
+        crossedMineIcon = initIcon(CROSSED_MINE_URL);
         mineIcon = initIcon(MINE_URL);
         explodedMineIcon = initIcon(EXPLODED_MINE_URL);
+        newGameIcon = initIcon(NEW_GAME_URL);
+        openSquareIcon = initIcon(OPEN_SQUARE_URL);
+        defeatIcon = initIcon(DEFEAT_URL);
+        victoryIcon = initIcon(VICTORY_URL);
+
     }
 
     private ImageIcon initIcon(String address) {
@@ -173,7 +229,7 @@ public class GameView extends JFrame {
         return null;
     }
 
-    private void createGrid(int rows, int cols) {
+    void createGrid(int rows, int cols) {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 buttons[row][col] = new JButton(unopenedIcon);
@@ -283,6 +339,10 @@ public class GameView extends JFrame {
 
     ImageIcon getUnopenedIcon() {
         return unopenedIcon;
+    }
+
+    ImageIcon getCrossedMineIcon() {
+        return crossedMineIcon;
     }
 
     ImageIcon getExplodedMineIcon() {
