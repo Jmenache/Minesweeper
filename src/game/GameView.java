@@ -107,6 +107,7 @@ public class GameView extends JFrame {
         gameMenu.add(newGameItem);
         gameMenu.addSeparator();
         gameMenu.add(StatisticsItem);
+        StatisticsItem.addActionListener(event -> notifyListeners(GameViewListener::onStatistics, event));
         gameMenu.add(OptionsItem);
         OptionsItem.addActionListener(event -> notifyListeners(GameViewListener::onOptions, event));
 

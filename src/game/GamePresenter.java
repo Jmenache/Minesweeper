@@ -1,5 +1,7 @@
 package game;
 
+import Statistics.StatisticsModel;
+import Statistics.StatisticsView;
 import options.OptionsModel;
 import options.OptionsView;
 
@@ -11,6 +13,8 @@ import java.awt.event.ActionEvent;
 public class GamePresenter implements GameViewListener {
     private final GameView gameView;
     private final GameModel gameModel;
+
+    private StatisticsView statisticsView = new StatisticsView();
 
     private OptionsView optionsView = new OptionsView();
     private OptionsModel optionsModel;
@@ -35,6 +39,11 @@ public class GamePresenter implements GameViewListener {
         }
 
         gameView.updateGUI();
+    }
+
+    @Override
+    public void onStatistics(ActionEvent event) {
+        statisticsView.setVisible(true);
     }
 
     @Override

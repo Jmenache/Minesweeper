@@ -99,12 +99,10 @@ public class GameModel {
 
     void incrementMineCount() {
         mineCount++;
-        System.out.println(mineCount);
     }
 
     void decrementMineCount() {
         mineCount--;
-        System.out.println(mineCount);
     }
 
     boolean wasLastEmptySquare() {
