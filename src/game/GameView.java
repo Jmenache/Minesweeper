@@ -6,12 +6,10 @@ import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.function.BiConsumer;
 
 
@@ -191,22 +189,15 @@ public class GameView extends JFrame {
 
                 int[] coordinates = {row, col};
                 buttons[row][col].addActionListener(event -> notifyListeners(GameViewListener::onOpenSquare, coordinates));
+
                 buttons[row][col].addMouseListener(new MouseInputAdapter() {
                     @Override
-                    public void mousePressed(MouseEvent e) {
-                        super.mousePressed(e);
-                        // System.out.println(e.getComponent());
-                        if (SwingUtilities.isRightMouseButton(e) && e.getClickCount() == 1) {
-                            buttons[coordinates[0]][coordinates[1]].isEnabled()
-                            if (buttons[coordinates[0]][coordinates[1]].isEnabled()) {
-                                buttons[coordinates[0]][coordinates[1]].setEnabled(false);
-                            } else {
-                                buttons[coordinates[0]][coordinates[1]].setEnabled(true);
-                            }
-                            // buttons[row][col].setDisabledIcon();
-                        }
-                        if (SwingUtilities.isMiddleMouseButton(e)) {
-                            System.out.println("lol2");
+                    public void mousePressed(MouseEvent event) {
+                        super.mousePressed(event);
+                        if (SwingUtilities.isRightMouseButton(event)/* && event.getClickCount() == 1*/) {
+                            notifyListeners(GameViewListener::onRightClick, coordinates);
+                        } else if (SwingUtilities.isMiddleMouseButton(event)) {
+                            notifyListeners(GameViewListener::onMiddleClick, coordinates);
                         }
                     }
                 });
@@ -224,9 +215,7 @@ public class GameView extends JFrame {
     }
 
     private <T> void notifyListeners(final BiConsumer<GameViewListener, T> consumer, final T data) {
-        for (final GameViewListener listener : listeners) {
-            consumer.accept(listener, data);
-        }
+        listeners.forEach(listener -> consumer.accept(listener, data));
     }
 
 	void updateGUI() {
@@ -244,6 +233,14 @@ public class GameView extends JFrame {
 
     JButton[][] getButtons() {
         return buttons;
+    }
+
+    public ImageIcon getFlagIcon() {
+        return flagIcon;
+    }
+
+    public ImageIcon getQuestionMarkIcon() {
+        return questionMarkIcon;
     }
 
     ImageIcon getUnopenedIcon() {

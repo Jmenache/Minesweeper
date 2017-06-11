@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 /**
  * game.GameViewListener Interface
  */
-public interface GameViewListener {
+public interface GameViewListener{
     // Menu
     void onNewGame(ActionEvent event);
     void onOptions(ActionEvent event);
@@ -13,4 +13,6 @@ public interface GameViewListener {
 
     // Game
     void onOpenSquare(int[] coordinates);
+    void onRightClick(int[] coordinates);
+    void onMiddleClick(int[] coordinates);
 }

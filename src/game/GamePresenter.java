@@ -20,17 +20,19 @@ public class GamePresenter implements GameViewListener {
         this.gameView = gameView;
         gameView.addListener(this);
         this.gameModel = gameModel;
+
+        newGame();
     }
 
     @Override
     public void onNewGame(ActionEvent event) {
-        System.out.println("New game");
+        newGame();
         for (int row = 0; row < gameModel.getRows(); row++) {
             for (int col = 0; col < gameModel.getColumns(); col++) {
                 gameView.getButtons()[row][col].setEnabled(true);
             }
         }
-        gameModel.setFirstOpen(true);
+
         gameView.updateGUI();
     }
 
@@ -56,39 +58,97 @@ public class GamePresenter implements GameViewListener {
     public void onOpenSquare(int[] coordinates) {
         int row = coordinates[0];
         int col = coordinates[1];
-        if(gameModel.isFirstOpen()) {
-            gameModel.generateMines(row, col);
-            gameView.mapIcons(gameModel.getMines());
-            gameModel.setFirstOpen(false);
-            // gameModel.printMap();
-        }
-        switch (gameModel.getMines()[row][col]) {
-            case 0:
-                openEmpty(row, col);
-                break;
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-                gameView.getButtons()[row][col].setEnabled(false);
-                break;
-            case -1:
-                gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
-                for (int r = 0; r < gameModel.getRows(); r++)
-                    for (int c = 0; c < gameModel.getColumns(); c++)
-                        if (gameView.getButtons()[r][c].isEnabled()) {
-                            if (gameModel.getMines()[r][c] != -1) {
-                                gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
+        if (gameModel.getButtonsState()[row][col] != GameModel.REVEALED) {
+            gameModel.getButtonsState()[row][col] = GameModel.REVEALED;
+            if(gameModel.isFirstOpen()) {
+                gameModel.generateMines(row, col);
+                gameView.mapIcons(gameModel.getMines());
+                gameModel.setFirstOpen(false);
+                // gameModel.printMap();
+            }
+            switch (gameModel.getMines()[row][col]) {
+                case 0:
+                    openEmpty(row, col);
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                    gameView.getButtons()[row][col].setEnabled(false);
+                    break;
+                case GameModel.MINE:
+                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
+                    for (int r = 0; r < gameModel.getRows(); r++)
+                        for (int c = 0; c < gameModel.getColumns(); c++)
+                            if (gameView.getButtons()[r][c].isEnabled()) {
+                                if (gameModel.getMines()[r][c] != GameModel.MINE) {
+                                    gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
+                                }
+                                gameView.getButtons()[r][c].setEnabled(false);
                             }
-                            gameView.getButtons()[r][c].setEnabled(false);
-                        }
+                    break;
+            }
+            gameView.updateGUI();
+        }
+
+    }
+
+    @Override
+    public void onRightClick(int[] coordinates) {
+        int row = coordinates[0];
+        int col = coordinates[1];
+        System.out.println(gameModel.getButtonsState()[row][col]);
+        switch (gameModel.getButtonsState()[row][col]) {
+            case GameModel.HIDDEN:
+                gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
+                gameView.getButtons()[row][col].setEnabled(false);
+                gameModel.getButtonsState()[row][col] = GameModel.FLAG;
+                break;
+            case GameModel.FLAG:
+                if (gameModel.isQuestionMarkEnabled()) {
+                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getQuestionMarkIcon());
+                    gameModel.getButtonsState()[row][col] = GameModel.QUESTION_MARK;
+                } else {
+                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getUnopenedIcon());
+                    gameView.getButtons()[row][col].setEnabled(true);
+                    gameModel.getButtonsState()[row][col] = GameModel.HIDDEN;
+                }
+                break;
+            case GameModel.QUESTION_MARK:
+                gameView.getButtons()[row][col].setDisabledIcon(gameView.getUnopenedIcon());
+                gameView.getButtons()[row][col].setEnabled(true);
+                gameModel.getButtonsState()[row][col] = GameModel.HIDDEN;
                 break;
         }
-        gameView.updateGUI();
+        // if (gameView.getButtons()[coordinates[0]][coordinates[1]].isEnabled()) {
+        //     gameView.getButtons()[coordinates[0]][coordinates[1]].setEnabled(false);
+        // } else {
+        //     gameView.getButtons()[coordinates[0]][coordinates[1]].setEnabled(true);
+        // }
+
+
+        // buttons[row][col].setDisabledIcon();
+        /*if (SwingUtilities.isMiddleMouseButton(event)) {
+            System.out.println("lol2");
+        }*/
+    }
+
+    @Override
+    public void onMiddleClick(int[] coordinates) {
+        System.out.println("Middle Click");
+        int row = coordinates[0];
+        int col = coordinates[1];
+    }
+
+    private void newGame() {
+        System.out.println("New game");
+
+        gameModel.resetButtonState();
+        gameModel.setFirstOpen(true);
     }
 
     private void openEmpty(int row, int col) {
