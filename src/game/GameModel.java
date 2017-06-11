@@ -12,7 +12,7 @@ public class GameModel {
     private int rows = 9;
     private int cols = 9;
     private int nbrBombs = 10;
-    
+
     private int[][] buttonsState;
     static final int CLOSED = 0;
     static final int OPENED = 1;

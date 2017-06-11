@@ -193,9 +193,9 @@ public class GameView extends JFrame {
                     @Override
                     public void mousePressed(MouseEvent event) {
                         super.mousePressed(event);
-                        if (SwingUtilities.isRightMouseButton(event)/* && event.getClickCount() == 1*/) {
+                        if (SwingUtilities.isRightMouseButton(event)) {
                             notifyListeners(GameViewListener::onRightClick, coordinates);
-                        } else if (SwingUtilities.isMiddleMouseButton(event)) {
+                        } else if (SwingUtilities.isMiddleMouseButton(event) || event.getClickCount() == 2) {
                             notifyListeners(GameViewListener::onMiddleClick, coordinates);
                         }
                     }
