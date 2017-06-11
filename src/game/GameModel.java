@@ -1,5 +1,6 @@
 package game;
 
+import javax.swing.*;
 import java.util.Random;
 
 /**
@@ -16,7 +17,7 @@ public class GameModel {
     static final int FLAGGED = 2;
     static final int QUESTION_MARKED = 3;
 
-    private int timer = 0;
+    private int seconds = 0;
 
     private int squareCount;
     private int mineCount;
@@ -61,12 +62,16 @@ public class GameModel {
         return buttonsState;
     }
 
-    int getTimer() {
-        return timer;
+    int getSeconds() {
+        return seconds;
+    }
+
+    void setSeconds(int seconds) {
+        this.seconds = seconds;
     }
 
     void incrementTimer() {
-        timer++;
+        seconds++;
     }
 
     void incrementMineCount() {

@@ -73,10 +73,12 @@ public class GameView extends JFrame {
 
     private JPanel btmpan;
     private JButton btnmine;
-    private JTextField timenum;
+    private JLabel timenum;
     private JButton btnface;
-    private JTextField numofmine;
+    private JLabel numofmine;
     private JButton btnTime;
+
+    private Timer timer;
 
     public GameView() {
         // Define Look and Feel
@@ -157,18 +159,18 @@ public class GameView extends JFrame {
         // btnmine.setBounds(14, 5, 63, 27);
         btmpan.add(btnmine);
 
-        timenum = new JTextField();
+        timenum = new JLabel();
+        timer = new Timer( 1000, e -> notifyListeners(GameViewListener::onTimerStart, e));
+        timer.setInitialDelay(0);
         // timenum.setBounds(91, 6, 116, 24);
-        timenum.setColumns(4);
         btmpan.add(timenum);
 
         btnface = new JButton("Face");
         // btnface.setBounds(284, 5, 65, 27);
         btmpan.add(btnface);
 
-        numofmine = new JTextField();
+        numofmine = new JLabel();
         // numofmine.setBounds(427, 6, 116, 24);
-        numofmine.setColumns(4);
         btmpan.add(numofmine);
 
         btnTime = new JButton("time");
@@ -229,7 +231,7 @@ public class GameView extends JFrame {
         return null;
     }
 
-    void createGrid(int rows, int cols) {
+    private void createGrid(int rows, int cols) {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 buttons[row][col] = new JButton(unopenedIcon);
@@ -347,5 +349,13 @@ public class GameView extends JFrame {
 
     ImageIcon getExplodedMineIcon() {
         return explodedMineIcon;
+    }
+
+    JLabel getTimenum() {
+        return timenum;
+    }
+
+    Timer getTimer() {
+        return timer;
     }
 }

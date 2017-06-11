@@ -5,7 +5,6 @@ import options.OptionsModel;
 import options.OptionsPresenter;
 import options.OptionsView;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -86,6 +85,12 @@ public class GamePresenter implements GameViewListener {
     }
 
     @Override
+    public void onTimerStart(ActionEvent event) {
+        gameModel.incrementTimer();
+        gameView.getTimenum().setText(String.valueOf(gameModel.getSeconds()));
+    }
+
+    @Override
     public void onRightClick(int[] coordinates) {
         int row = coordinates[0];
         int col = coordinates[1];
@@ -154,6 +159,10 @@ public class GamePresenter implements GameViewListener {
     private void newGame() {
         System.out.println("New game");
 
+        gameView.getTimer().stop();
+        gameModel.setSeconds(0);
+        gameView.getTimenum().setText("0");
+
         gameModel.resetButtonState(optionsModel.getRows(), optionsModel.getCols());
         gameModel.setMineCount(optionsModel.getNumberOfMines());
         gameModel.setSquareCount(optionsModel.getRows() * optionsModel.getCols());
@@ -163,12 +172,9 @@ public class GamePresenter implements GameViewListener {
 
     private void firstOpen(int row, int col) {
         generateMines(row, col);
-        Timer timer = new Timer( 1000, e -> {
-            gameModel.incrementTimer();
-            // gameView.updateTimer(gameModel.getTimer());
-        } );
+
         gameView.mapDisableIcons(gameModel.getMines());
-        timer.start();
+        gameView.getTimer().restart();
         gameModel.setFirstOpen(false);
         // gameModel.printMap();
     }
@@ -207,6 +213,9 @@ public class GamePresenter implements GameViewListener {
                 openEmpty(row, col);
                 break;
             case GameModel.MINE:
+                System.out.println("Game lost");
+
+                gameView.getTimer().stop();
                 gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
                 for (int r = 0; r < optionsModel.getRows(); r++)
                     for (int c = 0; c < optionsModel.getCols(); c++)
@@ -258,6 +267,7 @@ public class GamePresenter implements GameViewListener {
     private void gameWon() {
         System.out.println("Game won");
 
+        gameView.getTimer().stop();
         for (int row = 0; row < optionsModel.getRows(); row++) {
             for (int col = 0; col < optionsModel.getCols(); col++) {
                 if (gameModel.getMines()[row][col] == GameModel.MINE) {
@@ -269,6 +279,6 @@ public class GamePresenter implements GameViewListener {
     }
 
     private void saveGame() {
-        
+
     }
 }
