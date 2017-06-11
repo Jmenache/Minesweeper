@@ -10,11 +10,13 @@ import java.awt.List;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
+@SuppressWarnings("serial")
 public class StatisticsView extends JFrame {
 
 	private JPanel contentPane;
 	private JScrollPane scrollPane;
 	private JLabel lblLevel;
+	@SuppressWarnings("rawtypes")
 	private JList levelList;
 	private JLabel lblNewLabel;
 	private JTextField ResultTimes;
@@ -48,7 +50,7 @@ public class StatisticsView extends JFrame {
 	 */
 	public StatisticsView() {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setBounds(100, 100, 654, 296);
+		setBounds(100, 100, 734, 296);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -82,15 +84,15 @@ public class StatisticsView extends JFrame {
 		contentPane.add(GameWinNum);
 		
 		WinPercentNum = new JLabel("Win percentage : ");
-		WinPercentNum.setBounds(425, 81, 161, 29);
+		WinPercentNum.setBounds(425, 81, 235, 29);
 		contentPane.add(WinPercentNum);
 		
 		LongestWinningStreak = new JLabel("Longest winning streak : ");
-		LongestWinningStreak.setBounds(425, 108, 161, 29);
+		LongestWinningStreak.setBounds(425, 108, 251, 29);
 		contentPane.add(LongestWinningStreak);
 		
 		LongestLosingStreak = new JLabel("Longest losing streak : ");
-		LongestLosingStreak.setBounds(425, 135, 161, 29);
+		LongestLosingStreak.setBounds(425, 135, 209, 29);
 		contentPane.add(LongestLosingStreak);
 		
 		CurrentStreak = new JLabel("Current streak : ");
@@ -100,6 +102,9 @@ public class StatisticsView extends JFrame {
 		btnClose = new JButton("Close");
 		btnClose.setBounds(419, 202, 71, 27);
 		contentPane.add(btnClose);
+		btnClose.addActionListener(e -> {
+            dispose();
+        });
 		
 		btnReset = new JButton("Reset");
 		btnReset.addActionListener(new ActionListener() {

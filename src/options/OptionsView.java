@@ -197,6 +197,10 @@ public class OptionsView extends JFrame {
 		btnOK.setActionCommand("OK");
 		contentPane.add(btnOK);
 		getRootPane().setDefaultButton(btnOK);
+		btnOK.addActionListener(e -> {
+            clickedOK = true;
+            dispose(); //or set visible false
+        });
 		
 		btnCancel = new JButton("Cancel");
 		btnCancel.setBounds(444, 419, 105, 27);

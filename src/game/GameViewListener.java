@@ -8,8 +8,8 @@ import java.awt.event.ActionEvent;
 public interface GameViewListener{
     // Menu
     void onNewGame(ActionEvent event);
-    void onStatistics(ActionEvent event);
     void onOptions(ActionEvent event);
+    void onStatistics(ActionEvent event);
     void onExit(ActionEvent event);
 
     // Game
