@@ -159,19 +159,28 @@ public class GameView extends JFrame {
         // btnmine.setBounds(14, 5, 63, 27);
         btmpan.add(btnmine);
 
+        numofmine = new JLabel();
+        // numofmine.setBounds(427, 6, 116, 24);
+        btmpan.add(numofmine);
+
+
+        btnface = new JButton(newGameIcon);
+        btnface.setBorderPainted(false);
+        btnface.setBorder(null);
+        btnface.setFocusable(false);
+        btnface.setMargin(new Insets(0, 0, 0, 0));
+        btnface.setContentAreaFilled(false);
+        btnface.setFocusPainted(false);
+        btnface.setRolloverEnabled(false);
+        btnface.addActionListener(event -> notifyListeners(GameViewListener::onNewGame, event));
+        // btnface.setBounds(284, 5, 65, 27);
+        btmpan.add(btnface);
+
         timenum = new JLabel();
         timer = new Timer( 1000, e -> notifyListeners(GameViewListener::onTimerStart, e));
         timer.setInitialDelay(0);
         // timenum.setBounds(91, 6, 116, 24);
         btmpan.add(timenum);
-
-        btnface = new JButton("Face");
-        // btnface.setBounds(284, 5, 65, 27);
-        btmpan.add(btnface);
-
-        numofmine = new JLabel();
-        // numofmine.setBounds(427, 6, 116, 24);
-        btmpan.add(numofmine);
 
         btnTime = new JButton("time");
         btnTime.setEnabled(false);
@@ -351,8 +360,32 @@ public class GameView extends JFrame {
         return explodedMineIcon;
     }
 
+    ImageIcon getNewGameIcon() {
+        return newGameIcon;
+    }
+
+    ImageIcon getOpenSquareIcon() {
+        return openSquareIcon;
+    }
+
+    ImageIcon getDefeatIcon() {
+        return defeatIcon;
+    }
+
+    ImageIcon getVictoryIcon() {
+        return victoryIcon;
+    }
+
+    public JLabel getNumofmine() {
+        return numofmine;
+    }
+
     JLabel getTimenum() {
         return timenum;
+    }
+
+    JButton getBtnface() {
+        return btnface;
     }
 
     Timer getTimer() {

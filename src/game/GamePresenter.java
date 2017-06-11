@@ -38,6 +38,8 @@ public class GamePresenter implements GameViewListener {
             }
         }
 
+        gameView.getBtnface().setIcon(gameView.getNewGameIcon());
+
         gameView.updateGUI();
     }
 
@@ -102,6 +104,7 @@ public class GamePresenter implements GameViewListener {
                     gameView.getButtons()[row][col].setEnabled(false);
                     gameModel.getButtonsState()[row][col] = GameModel.FLAGGED;
                     gameModel.decrementMineCount();
+                    gameView.getNumofmine().setText(String.valueOf(gameModel.getMineCount()));
                     break;
                 case GameModel.FLAGGED:
                     gameModel.incrementMineCount();
@@ -159,6 +162,8 @@ public class GamePresenter implements GameViewListener {
     private void newGame() {
         System.out.println("New game");
 
+        gameView.getNumofmine().setText(String.valueOf(optionsModel.getNumberOfMines()));
+
         gameView.getTimer().stop();
         gameModel.setSeconds(0);
         gameView.getTimenum().setText("0");
@@ -213,26 +218,31 @@ public class GamePresenter implements GameViewListener {
                 openEmpty(row, col);
                 break;
             case GameModel.MINE:
-                System.out.println("Game lost");
-
-                gameView.getTimer().stop();
-                gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
-                for (int r = 0; r < optionsModel.getRows(); r++)
-                    for (int c = 0; c < optionsModel.getCols(); c++)
-                        if (gameView.getButtons()[r][c].isEnabled()) {
-                            if (gameModel.getMines()[r][c] != GameModel.MINE) {
-                                gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
-                            }
-                            gameView.getButtons()[r][c].setEnabled(false);
-                        } else if (gameModel.getButtonsState()[r][c] == GameModel.FLAGGED) {
-                            gameView.getButtons()[r][c].setDisabledIcon(gameView.getCrossedMineIcon());
-                        }
+                gameLost(row, col);
                 break;
             default:
                 open(row, col);
                 break;
         }
         gameView.updateGUI();
+    }
+
+    private void gameLost(int row, int col) {
+        System.out.println("Game lost");
+
+        gameView.getTimer().stop();
+        gameView.getBtnface().setIcon(gameView.getDefeatIcon());
+        gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
+        for (int r = 0; r < optionsModel.getRows(); r++)
+            for (int c = 0; c < optionsModel.getCols(); c++)
+                if (gameView.getButtons()[r][c].isEnabled()) {
+                    if (gameModel.getMines()[r][c] != GameModel.MINE) {
+                        gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
+                    }
+                    gameView.getButtons()[r][c].setEnabled(false);
+                } else if (gameModel.getButtonsState()[r][c] == GameModel.FLAGGED  && gameModel.getMines()[r][c] != GameModel.MINE) {
+                    gameView.getButtons()[r][c].setDisabledIcon(gameView.getCrossedMineIcon());
+                }
     }
 
     private void openEmpty(int row, int col) {
@@ -257,7 +267,6 @@ public class GamePresenter implements GameViewListener {
         gameModel.getButtonsState()[row][col] = GameModel.OPENED;
         gameModel.decrementSquareCount();
         if (wasLastEmptySquare()) gameWon();
-
     }
 
     private boolean wasLastEmptySquare() {
@@ -268,6 +277,10 @@ public class GamePresenter implements GameViewListener {
         System.out.println("Game won");
 
         gameView.getTimer().stop();
+
+        gameView.getNumofmine().setText("0");
+        gameView.getBtnface().setIcon(gameView.getVictoryIcon());
+
         for (int row = 0; row < optionsModel.getRows(); row++) {
             for (int col = 0; col < optionsModel.getCols(); col++) {
                 if (gameModel.getMines()[row][col] == GameModel.MINE) {
