@@ -19,7 +19,7 @@ import java.util.function.BiConsumer;
 @SuppressWarnings("serial")
 public class GameView extends JFrame {
     private static final String TITLE = "Minesweeper";
-    private static final int WIDTH = 400, HEIGHT = 500;
+    // private static final int WIDTH = 400, HEIGHT = 500;
     private final ArrayList<GameViewListener> listeners;
 
     private final GridBagConstraints c;
@@ -28,8 +28,8 @@ public class GameView extends JFrame {
 
     private final JButton[][] buttons;
     private final JPanel gridPane;
-    private final static String ZERO_URL = "/images/200px-Minesweeper_0.svg.png";
 
+    private final static String ZERO_URL = "/images/200px-Minesweeper_0.svg.png";
     private final static String ONE_URL = "/images/200px-Minesweeper_1.svg.png";
     private final static String TWO_URL = "/images/200px-Minesweeper_2.svg.png";
     private final static String THREE_URL = "/images/200px-Minesweeper_3.svg.png";
@@ -67,13 +67,13 @@ public class GameView extends JFrame {
             ex.printStackTrace();
         }
 
+        initIcons();
+
         // Create Frame
         frame = new JFrame(TITLE);
-        URL mineIconURL = getClass().getResource("/images/mineIcon.png");
-        ImageIcon mineIcon = new ImageIcon(mineIconURL);
         frame.setIconImage(mineIcon.getImage());
 
-        frame.setSize(WIDTH ,HEIGHT);
+        // frame.setSize(WIDTH ,HEIGHT);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
@@ -122,7 +122,6 @@ public class GameView extends JFrame {
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
 
-        initIcons();
         int rowAndCol = 9;
         buttons = new JButton[rowAndCol][rowAndCol];
         createGrid(rowAndCol, rowAndCol);
@@ -204,12 +203,50 @@ public class GameView extends JFrame {
 
                 c.gridx = row;
                 c.gridy = col;
-                // threeLabel.setSize(buttons[row][col].getSize());
-                // threeLabel.setMinimumSize(buttons[row][col].getMinimumSize());
-                // threeLabel.setMaximumSize(buttons[row][col].getMaximumSize());
-                // threeLabel.setPreferredSize(buttons[row][col].getPreferredSize());
                 gridPane.add(buttons[row][col], c);
-                // buttons[row][col].setVisible(false);
+            }
+        }
+    }
+
+    void mapIcon(int[][] mines, int row, int col) {
+        switch (mines[row][col]) {
+            case 0:
+                buttons[row][col].setDisabledIcon(zeroIcon);
+                break;
+            case 1:
+                buttons[row][col].setDisabledIcon(oneIcon);
+                break;
+            case 2:
+                buttons[row][col].setDisabledIcon(twoIcon);
+                break;
+            case 3:
+                buttons[row][col].setDisabledIcon(threeIcon);
+                break;
+            case 4:
+                buttons[row][col].setDisabledIcon(fourIcon);
+                break;
+            case 5:
+                buttons[row][col].setDisabledIcon(fiveIcon);
+                break;
+            case 6:
+                buttons[row][col].setDisabledIcon(sixIcon);
+                break;
+            case 7:
+                buttons[row][col].setDisabledIcon(sevenIcon);
+                break;
+            case 8:
+                buttons[row][col].setDisabledIcon(eightIcon);
+                break;
+            case -1:
+                buttons[row][col].setDisabledIcon(mineIcon);
+                break;
+        }
+    }
+
+    void mapIcons(int[][] mines) {
+        for (int row = 0; row < mines.length; row++) {
+            for (int col = 0; col < mines[row].length; col++) {
+                mapIcon(mines, row, col);
             }
         }
     }
@@ -235,11 +272,11 @@ public class GameView extends JFrame {
         return buttons;
     }
 
-    public ImageIcon getFlagIcon() {
+    ImageIcon getFlagIcon() {
         return flagIcon;
     }
 
-    public ImageIcon getQuestionMarkIcon() {
+    ImageIcon getQuestionMarkIcon() {
         return questionMarkIcon;
     }
 
@@ -249,44 +286,5 @@ public class GameView extends JFrame {
 
     ImageIcon getExplodedMineIcon() {
         return explodedMineIcon;
-    }
-
-    void mapIcons(int[][] mines) {
-        for (int row = 0; row < mines.length; row++) {
-            for (int col = 0; col < mines[row].length; col++) {
-                switch (mines[row][col]) {
-                    case 0:
-                        buttons[row][col].setDisabledIcon(zeroIcon);
-                        break;
-                    case 1:
-                        buttons[row][col].setDisabledIcon(oneIcon);
-                        break;
-                    case 2:
-                        buttons[row][col].setDisabledIcon(twoIcon);
-                        break;
-                    case 3:
-                        buttons[row][col].setDisabledIcon(threeIcon);
-                        break;
-                    case 4:
-                        buttons[row][col].setDisabledIcon(fourIcon);
-                        break;
-                    case 5:
-                        buttons[row][col].setDisabledIcon(fiveIcon);
-                        break;
-                    case 6:
-                        buttons[row][col].setDisabledIcon(sixIcon);
-                        break;
-                    case 7:
-                        buttons[row][col].setDisabledIcon(sevenIcon);
-                        break;
-                    case 8:
-                        buttons[row][col].setDisabledIcon(eightIcon);
-                        break;
-                    case -1:
-                        buttons[row][col].setDisabledIcon(mineIcon);
-                        break;
-                }
-            }
-        }
     }
 }

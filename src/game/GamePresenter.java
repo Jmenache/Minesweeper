@@ -39,7 +39,7 @@ public class GamePresenter implements GameViewListener {
     @Override
     public void onOptions(ActionEvent event) {
         optionsView.setVisible(true);
-        if(optionsView.isClickedOK()){
+        if(optionsView.isClickedOK()) {
             optionsModel = optionsView.getOptionsModel();
             System.out.println(optionsModel.getWidth() + "," + optionsModel.getHeight() + "," + optionsModel.getNumOfMines());
             gameView.updateGUI();
@@ -58,80 +58,70 @@ public class GamePresenter implements GameViewListener {
     public void onOpenSquare(int[] coordinates) {
         int row = coordinates[0];
         int col = coordinates[1];
-        if (gameModel.getButtonsState()[row][col] != GameModel.REVEALED) {
-            gameModel.getButtonsState()[row][col] = GameModel.REVEALED;
-            if(gameModel.isFirstOpen()) {
-                gameModel.generateMines(row, col);
-                gameView.mapIcons(gameModel.getMines());
-                gameModel.setFirstOpen(false);
-                // gameModel.printMap();
-            }
-            switch (gameModel.getMines()[row][col]) {
-                case 0:
-                    openEmpty(row, col);
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                    revealButton(row, col);
-                    break;
-                case GameModel.MINE:
-                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
-                    for (int r = 0; r < gameModel.getRows(); r++)
-                        for (int c = 0; c < gameModel.getColumns(); c++)
-                            if (gameView.getButtons()[r][c].isEnabled()) {
-                                if (gameModel.getMines()[r][c] != GameModel.MINE) {
-                                    gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
-                                }
-                                gameView.getButtons()[r][c].setEnabled(false);
-                            }
-                    break;
-            }
-            gameView.updateGUI();
-        }
 
+        if (gameModel.getButtonsState()[row][col] != GameModel.FLAGGED) {
+            if(gameModel.isFirstOpen()) firstOpen(row, col);
+            openSquare(row, col);
+        }
     }
 
     @Override
     public void onRightClick(int[] coordinates) {
         int row = coordinates[0];
         int col = coordinates[1];
-        if (gameModel.getButtonsState()[row][col] != GameModel.REVEALED) {
+
+        if (gameModel.getButtonsState()[row][col] != GameModel.OPENED) {
             switch (gameModel.getButtonsState()[row][col]) {
-                case GameModel.HIDDEN:
+                case GameModel.CLOSED:
                     gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
                     gameView.getButtons()[row][col].setEnabled(false);
-                    gameModel.getButtonsState()[row][col] = GameModel.FLAG;
+                    gameModel.getButtonsState()[row][col] = GameModel.FLAGGED;
                     break;
-                case GameModel.FLAG:
+                case GameModel.FLAGGED:
+                    gameView.mapIcon(gameModel.getMines(), row, col);
+                    gameView.getButtons()[row][col].setEnabled(true);
                     if (gameModel.isQuestionMarkEnabled()) {
-                        gameView.getButtons()[row][col].setDisabledIcon(gameView.getQuestionMarkIcon());
-                        gameModel.getButtonsState()[row][col] = GameModel.QUESTION_MARK;
+                        gameView.getButtons()[row][col].setIcon(gameView.getQuestionMarkIcon());
+                        gameModel.getButtonsState()[row][col] = GameModel.QUESTION_MARKED;
                     } else {
-                        gameView.getButtons()[row][col].setDisabledIcon(gameView.getUnopenedIcon());
-                        gameView.getButtons()[row][col].setEnabled(true);
-                        gameModel.getButtonsState()[row][col] = GameModel.HIDDEN;
+                        gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
+                        gameModel.getButtonsState()[row][col] = GameModel.CLOSED;
                     }
                     break;
-                case GameModel.QUESTION_MARK:
-                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getUnopenedIcon());
-                    gameView.getButtons()[row][col].setEnabled(true);
-                    gameModel.getButtonsState()[row][col] = GameModel.HIDDEN;
+                case GameModel.QUESTION_MARKED:
+                    gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
+                    gameModel.getButtonsState()[row][col] = GameModel.CLOSED;
                     break;
             }
+            gameView.updateGUI();
         }
     }
 
     @Override
     public void onMiddleClick(int[] coordinates) {
-        System.out.println("Middle Click");
         int row = coordinates[0];
         int col = coordinates[1];
+
+        if (gameModel.getButtonsState()[row][col] == GameModel.OPENED) {
+            int flagCount = 0;
+            for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
+                for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
+                    if (nearRow >= 0 && nearRow < gameModel.getRows() && nearCol >= 0 && nearCol < gameModel.getColumns()) {
+                        if (gameModel.getButtonsState()[nearRow][nearCol] == GameModel.FLAGGED) {
+                            flagCount++;
+                        }
+                    }
+
+            if (gameModel.getMines()[row][col] == flagCount) {
+                for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
+                    for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
+                        if (nearRow >= 0 && nearRow < gameModel.getRows() && nearCol >= 0 && nearCol < gameModel.getColumns()) {
+                            if (gameModel.getButtonsState()[nearRow][nearCol] != GameModel.FLAGGED && gameModel.getButtonsState()[nearRow][nearCol] != GameModel.OPENED) {
+                                openSquare(nearRow, nearCol);
+                            }
+                        }
+            }
+        }
     }
 
     private void newGame() {
@@ -141,23 +131,53 @@ public class GamePresenter implements GameViewListener {
         gameModel.setFirstOpen(true);
     }
 
+    private void firstOpen(int row, int col) {
+        gameModel.generateMines(row, col);
+        gameView.mapIcons(gameModel.getMines());
+        gameModel.setFirstOpen(false);
+        // gameModel.printMap();
+    }
+
+    private void openSquare(int row, int col) {
+        switch (gameModel.getMines()[row][col]) {
+            case GameModel.EMPTY:
+                gameModel.getButtonsState()[row][col] = GameModel.OPENED;
+                openEmpty(row, col);
+                break;
+            case GameModel.MINE:
+                gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
+                for (int r = 0; r < gameModel.getRows(); r++)
+                    for (int c = 0; c < gameModel.getColumns(); c++)
+                        if (gameView.getButtons()[r][c].isEnabled()) {
+                            if (gameModel.getMines()[r][c] != GameModel.MINE) {
+                                gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
+                            }
+                            gameView.getButtons()[r][c].setEnabled(false);
+                        }
+                break;
+            default:
+                gameView.getButtons()[row][col].setEnabled(false);
+                gameModel.getButtonsState()[row][col] = GameModel.OPENED;
+                break;
+        }
+        gameView.updateGUI();
+    }
+
     private void openEmpty(int row, int col) {
         for (int nearRow = row - 1; nearRow <= row + 1; nearRow++) {
             for (int nearCol = col - 1; nearCol <= col + 1; nearCol++) {
                 if (nearRow >= 0 && nearRow < gameModel.getRows() && nearCol >= 0 && nearCol < gameModel.getColumns()) {
-                    if (gameModel.getMines()[nearRow][nearCol] != -1 && gameView.getButtons()[nearRow][nearCol].isEnabled()) {
-                        revealButton(nearRow, nearCol);
-                        if (gameModel.getMines()[nearRow][nearCol] == 0) {
-                            openEmpty(nearRow, nearCol);
-                        }
-                    }
+                    if (gameModel.getMines()[nearRow][nearCol] != GameModel.MINE)
+                        if (gameView.getButtons()[nearRow][nearCol].isEnabled())
+                            if (gameModel.getButtonsState()[nearRow][nearCol] != GameModel.FLAGGED) {
+                                gameView.getButtons()[nearRow][nearCol].setEnabled(false);
+                                gameModel.getButtonsState()[nearRow][nearCol] = GameModel.OPENED;
+                                if (gameModel.getMines()[nearRow][nearCol] == GameModel.EMPTY) {
+                                    openEmpty(nearRow, nearCol);
+                                }
+                            }
                 }
             }
         }
-    }
-
-    private void revealButton(int row, int col) {
-        gameModel.getButtonsState()[row][col] = GameModel.REVEALED;
-        gameView.getButtons()[row][col].setEnabled(false);
     }
 }

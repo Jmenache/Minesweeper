@@ -6,24 +6,28 @@ import java.util.Random;
  * game.GameModel Class
  */
 public class GameModel {
+    private Random rand = new Random();
+
     private int[][] mines;
     private int rows = 9;
     private int cols = 9;
     private int nbrBombs = 10;
+    
     private int[][] buttonsState;
+    static final int CLOSED = 0;
+    static final int OPENED = 1;
+    static final int FLAGGED = 2;
 
-    static final int HIDDEN = 0;
-    static final int REVEALED = 1;
-    static final int FLAG = 2;
-    static final int QUESTION_MARK = 3;
-
-    static final int MINE = -1;
-
-    private Random rand = new Random();
+    static final int QUESTION_MARKED = 3;
 
     private boolean firstOpen;
+
+    static final int EMPTY = 0;
+    static final int MINE = -1;
+
+
     private boolean questionMarkEnabled = false;
-    private String difficulty = "beginner";
+    // private String difficulty = "beginner";
 
     void generateMines(int safeRow, int safeCol) {
         mines = new int[rows][cols];
@@ -80,19 +84,15 @@ public class GameModel {
         return cols;
     }
 
-    public int[][] getButtonsState() {
+    int[][] getButtonsState() {
         return buttonsState;
-    }
-
-    public String getDifficulty() {
-        return difficulty;
     }
 
     boolean isFirstOpen() {
         return firstOpen;
     }
 
-    public boolean isQuestionMarkEnabled() {
+    boolean isQuestionMarkEnabled() {
         return questionMarkEnabled;
     }
 
