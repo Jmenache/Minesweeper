@@ -146,6 +146,11 @@ public class GamePresenter implements GameViewListener {
         }
     }
 
+    @Override
+    public void onLoadGame() {
+        
+    }
+
     private void newGame() {
         System.out.println("New game");
 
