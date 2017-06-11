@@ -17,9 +17,10 @@ public class GameModel {
     static final int CLOSED = 0;
     static final int OPENED = 1;
     static final int FLAGGED = 2;
-
     static final int QUESTION_MARKED = 3;
 
+    private int squareCount;
+    private int mineCount;
     private boolean firstOpen;
 
     static final int EMPTY = 0;
@@ -28,6 +29,10 @@ public class GameModel {
 
     private boolean questionMarkEnabled = false;
     // private String difficulty = "beginner";
+
+    void generateMines() {
+        mines = new int[rows][cols];
+    }
 
     void generateMines(int safeRow, int safeCol) {
         mines = new int[rows][cols];
@@ -80,12 +85,46 @@ public class GameModel {
         return rows;
     }
 
-    int getColumns() {
+    int getCols() {
         return cols;
+    }
+
+    int getNbrBombs() {
+        return nbrBombs;
     }
 
     int[][] getButtonsState() {
         return buttonsState;
+    }
+
+    void incrementMineCount() {
+        mineCount++;
+        System.out.println(mineCount);
+    }
+
+    void decrementMineCount() {
+        mineCount--;
+        System.out.println(mineCount);
+    }
+
+    boolean wasLastEmptySquare() {
+        return squareCount - nbrBombs == 0;
+    }
+
+    void decrementSquareCount() {
+        squareCount--;
+    }
+
+    void setSquareCount(int squareCount) {
+        this.squareCount = squareCount;
+    }
+
+    int getMineCount() {
+        return mineCount;
+    }
+
+    void setMineCount(int mineCount) {
+        this.mineCount = mineCount;
     }
 
     boolean isFirstOpen() {

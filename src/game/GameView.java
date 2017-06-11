@@ -208,7 +208,7 @@ public class GameView extends JFrame {
         }
     }
 
-    void mapIcon(int[][] mines, int row, int col) {
+    void mapDisableIcon(int[][] mines, int row, int col) {
         switch (mines[row][col]) {
             case 0:
                 buttons[row][col].setDisabledIcon(zeroIcon);
@@ -243,10 +243,10 @@ public class GameView extends JFrame {
         }
     }
 
-    void mapIcons(int[][] mines) {
+    void mapDisableIcons(int[][] mines) {
         for (int row = 0; row < mines.length; row++) {
             for (int col = 0; col < mines[row].length; col++) {
-                mapIcon(mines, row, col);
+                mapDisableIcon(mines, row, col);
             }
         }
     }
