@@ -78,7 +78,7 @@ public class GamePresenter implements GameViewListener {
                 case 6:
                 case 7:
                 case 8:
-                    gameView.getButtons()[row][col].setEnabled(false);
+                    revealButton(row, col);
                     break;
                 case GameModel.MINE:
                     gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
@@ -101,40 +101,30 @@ public class GamePresenter implements GameViewListener {
     public void onRightClick(int[] coordinates) {
         int row = coordinates[0];
         int col = coordinates[1];
-        System.out.println(gameModel.getButtonsState()[row][col]);
-        switch (gameModel.getButtonsState()[row][col]) {
-            case GameModel.HIDDEN:
-                gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
-                gameView.getButtons()[row][col].setEnabled(false);
-                gameModel.getButtonsState()[row][col] = GameModel.FLAG;
-                break;
-            case GameModel.FLAG:
-                if (gameModel.isQuestionMarkEnabled()) {
-                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getQuestionMarkIcon());
-                    gameModel.getButtonsState()[row][col] = GameModel.QUESTION_MARK;
-                } else {
+        if (gameModel.getButtonsState()[row][col] != GameModel.REVEALED) {
+            switch (gameModel.getButtonsState()[row][col]) {
+                case GameModel.HIDDEN:
+                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
+                    gameView.getButtons()[row][col].setEnabled(false);
+                    gameModel.getButtonsState()[row][col] = GameModel.FLAG;
+                    break;
+                case GameModel.FLAG:
+                    if (gameModel.isQuestionMarkEnabled()) {
+                        gameView.getButtons()[row][col].setDisabledIcon(gameView.getQuestionMarkIcon());
+                        gameModel.getButtonsState()[row][col] = GameModel.QUESTION_MARK;
+                    } else {
+                        gameView.getButtons()[row][col].setDisabledIcon(gameView.getUnopenedIcon());
+                        gameView.getButtons()[row][col].setEnabled(true);
+                        gameModel.getButtonsState()[row][col] = GameModel.HIDDEN;
+                    }
+                    break;
+                case GameModel.QUESTION_MARK:
                     gameView.getButtons()[row][col].setDisabledIcon(gameView.getUnopenedIcon());
                     gameView.getButtons()[row][col].setEnabled(true);
                     gameModel.getButtonsState()[row][col] = GameModel.HIDDEN;
-                }
-                break;
-            case GameModel.QUESTION_MARK:
-                gameView.getButtons()[row][col].setDisabledIcon(gameView.getUnopenedIcon());
-                gameView.getButtons()[row][col].setEnabled(true);
-                gameModel.getButtonsState()[row][col] = GameModel.HIDDEN;
-                break;
+                    break;
+            }
         }
-        // if (gameView.getButtons()[coordinates[0]][coordinates[1]].isEnabled()) {
-        //     gameView.getButtons()[coordinates[0]][coordinates[1]].setEnabled(false);
-        // } else {
-        //     gameView.getButtons()[coordinates[0]][coordinates[1]].setEnabled(true);
-        // }
-
-
-        // buttons[row][col].setDisabledIcon();
-        /*if (SwingUtilities.isMiddleMouseButton(event)) {
-            System.out.println("lol2");
-        }*/
     }
 
     @Override
@@ -156,7 +146,7 @@ public class GamePresenter implements GameViewListener {
             for (int nearCol = col - 1; nearCol <= col + 1; nearCol++) {
                 if (nearRow >= 0 && nearRow < gameModel.getRows() && nearCol >= 0 && nearCol < gameModel.getColumns()) {
                     if (gameModel.getMines()[nearRow][nearCol] != -1 && gameView.getButtons()[nearRow][nearCol].isEnabled()) {
-                        gameView.getButtons()[nearRow][nearCol].setEnabled(false);
+                        revealButton(nearRow, nearCol);
                         if (gameModel.getMines()[nearRow][nearCol] == 0) {
                             openEmpty(nearRow, nearCol);
                         }
@@ -164,5 +154,10 @@ public class GamePresenter implements GameViewListener {
                 }
             }
         }
+    }
+
+    private void revealButton(int row, int col) {
+        gameModel.getButtonsState()[row][col] = GameModel.REVEALED;
+        gameView.getButtons()[row][col].setEnabled(false);
     }
 }
