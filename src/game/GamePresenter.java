@@ -6,319 +6,431 @@ import options.OptionsPresenter;
 import options.OptionsView;
 
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Scanner;
 
 /**
  * game.GamePresenter Class
  */
 public class GamePresenter implements GameViewListener {
-    private final OptionsModel optionsModel;
-    private final GameModel gameModel;
-    private final GameView gameView;
+	private final OptionsModel optionsModel;
+	private final GameModel gameModel;
+	private final GameView gameView;
 
-    private StatisticsView statisticsView = new StatisticsView();
+	private StatisticsView statisticsView = new StatisticsView();
 
+	public GamePresenter(final GameView gameView, final GameModel gameModel, final OptionsModel optionsModel) {
+		this.optionsModel = optionsModel;
 
-    public GamePresenter(final GameView gameView, final GameModel gameModel, final OptionsModel optionsModel) {
-        this.optionsModel = optionsModel;
+		this.gameModel = gameModel;
+		this.gameView = gameView;
+		gameView.addListener(this);
 
-        this.gameModel = gameModel;
-        this.gameView = gameView;
-        gameView.addListener(this);
+		newGame();
+	}
 
-        newGame();
-    }
+	@Override
+	public void onNewGame(ActionEvent event) {
+		newGame();
+		for (int row = 0; row < optionsModel.getRows(); row++) {
+			for (int col = 0; col < optionsModel.getCols(); col++) {
+				gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
+				gameView.getButtons()[row][col].setEnabled(true);
+			}
+		}
 
-    @Override
-    public void onNewGame(ActionEvent event) {
-        newGame();
-        for (int row = 0; row < optionsModel.getRows(); row++) {
-            for (int col = 0; col < optionsModel.getCols(); col++) {
-                gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
-                gameView.getButtons()[row][col].setEnabled(true);
-            }
-        }
+		gameView.getBtnface().setIcon(gameView.getNewGameIcon());
 
-        gameView.getBtnface().setIcon(gameView.getNewGameIcon());
+		gameView.updateGUI();
+	}
 
-        gameView.updateGUI();
-    }
+	@Override
+	public void onStatistics(ActionEvent event) {
+		statisticsView.setVisible(true);
+	}
 
-    @Override
-    public void onStatistics(ActionEvent event) {
-        statisticsView.setVisible(true);
-    }
+	@Override
+	public void onOptions(ActionEvent event) {
+		OptionsView optionsView = new OptionsView();
+		new OptionsPresenter(optionsView, optionsModel);
 
-    @Override
-    public void onOptions(ActionEvent event) {
-        OptionsView optionsView = new OptionsView();
-        new OptionsPresenter(optionsView, optionsModel);
+		/*
+		 * optionsView.setVisible(true); if(optionsView.isClickedOK()) {
+		 * optionsModel = optionsView.getOptionsModel();
+		 * System.out.println(optionsModel.getCols() + "," +
+		 * optionsModel.getRows() + "," + optionsModel.getNumberOfMines());
+		 * gameView.updateGUI(); }
+		 */
 
-        /*optionsView.setVisible(true);
-        if(optionsView.isClickedOK()) {
-            optionsModel = optionsView.getOptionsModel();
-            System.out.println(optionsModel.getCols() + "," + optionsModel.getRows() + "," + optionsModel.getNumberOfMines());
-            gameView.updateGUI();
-        }*/
+		// optionsView.dispose();
+	}
 
-        //optionsView.dispose();
-    }
+	@Override
+	public void onSaveGame(ActionEvent event) {
+		FileOutputStream saveObject = null;
+		try {
+			saveObject = new FileOutputStream("data.txt");
+			PrintWriter x = new PrintWriter(saveObject, true);
 
-    @Override
-    public void onSaveGame(ActionEvent event) {
-        FileOutputStream saveObject = null;
-        try {
-            saveObject = new FileOutputStream("data.txt");
-            PrintWriter x = new PrintWriter(saveObject, true);
+			// x.println("getRows");
+			x.println(optionsModel.getRows());
 
-            x.println("getMines");
-            for (int row = 0; row < optionsModel.getRows(); row++) {
-                for (int col = 0; col < optionsModel.getCols(); col++) {
-                    x.print(gameModel.getMines()[row][col] + " ");
-                }
-                x.println("");
-            }
+			// x.println("getCols");
+			x.println(optionsModel.getCols());
 
-            x.println("getButtonsState");
-            for (int row = 0; row < optionsModel.getRows(); row++) {
-                for (int col = 0; col < optionsModel.getCols(); col++) {
-                    x.print(gameModel.getButtonsState()[row][col] + " ");
-                }
-                x.println("");
-            }
+			// x.println("getSeconds");
+			x.println(gameModel.getSeconds());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+			x.println(optionsModel.getNumberOfMines());
 
-    @Override
-    public void onLoadGame(ActionEvent event) {
+			// x.println("getMines");
+			for (int row = 0; row < optionsModel.getRows(); row++) {
+				for (int col = 0; col < optionsModel.getCols(); col++) {
+					x.print(gameModel.getMines()[col][row] + " ");
+				}
+				x.println("");
+			}
 
-    }
+			// x.println("getButtonsState");
+			for (int row = 0; row < optionsModel.getRows(); row++) {
+				for (int col = 0; col < optionsModel.getCols(); col++) {
+					x.print(gameModel.getButtonsState()[col][row] + " ");
+				}
+				x.println("");
+			}
 
-    @Override
-    public void onExit(ActionEvent event) {
-        gameView.getFrame().dispose();
-        // gameView.getFrame().dispatchEvent(new WindowEvent(gameView.getFrame(), WindowEvent.WINDOW_CLOSING));
-    }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    @Override
-    public void onCreateGrid(int i) {
-        // gameView.initiateButtons(optionsModel.getRows(), optionsModel.getCols());
-        // gameView.createGrid(optionsModel.getRows(), optionsModel.getCols());
-    }
+	@SuppressWarnings("resource")
+	@Override
+	public void onLoadGame(ActionEvent event) {
+		int savedRows = 0;
+		int savedCols =0;
+		int savedTime =0;
+		int savedNumMines =0;
+		
+		int savedSet[][];
+		OptionsModel savedModel = new OptionsModel(savedNumMines,savedRows,savedCols);
+		GameModel savedGameModel = new GameModel();
+		savedGameModel.initiateMines(savedRows, savedCols);
+		savedGameModel.resetButtonState(savedRows, savedCols);
+		
+		String tmp[] = null;
+		try {
+			String savedFile = "data.txt";
+			String line = "";
+			BufferedReader br = new BufferedReader(new FileReader(savedFile));
+			 if((line = br.readLine()) != null)
+				savedRows=Integer.parseInt(line);
+			 if((line = br.readLine()) != null)
+				savedCols=Integer.parseInt(line);
+			 if((line = br.readLine()) != null)
+				savedTime=Integer.parseInt(line);
+			 if((line = br.readLine()) != null)
+				savedNumMines=Integer.parseInt(line);
 
-    @Override
-    public void onOpenSquare(int[] coordinates) {
-        int row = coordinates[0];
-        int col = coordinates[1];
+			 System.out.println(savedTime);
+			 //for mine view setting
+			 for (int row = 0; row < savedRows; row++) {
+				 if((line = br.readLine()) != null){
+					 tmp=line.split(" ");
+				 }
+				 for (int col = 0; col < savedCols; col++) {
+					System.out.print(Integer.parseInt(tmp[col])+",");	
+					/*if(tmp[col]=="-1")
+						savedGameModel.mines[row][col]=-1;
+					else
+					savedGameModel.mines[row][col]=Integer.parseInt(tmp[col]);
+					*/
+					}
+				 System.out.println();
+				}
+			 
+			 //for mine buttonsState view setting
+			 for (int row = 0; row < savedRows; row++) {
+				 if((line = br.readLine()) != null){
+					 tmp=line.split(" ");
+				 }
+				 for (int col = 0; col < savedCols; col++) {
+					System.out.print(Integer.parseInt(tmp[col])+",");	
+					/*if(tmp[col]=="-1")
+						savedGameModel.buttonsState[row][col]=-1;
+					else
+					savedGameModel.buttonsState[row][col]=Integer.parseInt(tmp[col]);
+					*/
+					}
+				 System.out.println();
+				}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-        if (gameModel.getButtonsState()[row][col] != GameModel.FLAGGED) {
-            if(gameModel.isFirstOpen()) firstOpen(row, col);
-            openSquare(row, col);
-        }
-    }
+		
+		
+		gameView.getNumofmine().setText(String.valueOf(savedModel.getNumberOfMines()));
 
-    @Override
-    public void onTimerStart(ActionEvent event) {
-        gameModel.incrementTimer();
-        gameView.getTimenum().setText(String.valueOf(gameModel.getSeconds()));
-    }
+		gameView.getTimer().stop();
+		savedGameModel.setSeconds(savedTime);
+		gameView.getTimenum().setText(savedTime+"");
 
-    @Override
-    public void onRightClick(int[] coordinates) {
-        int row = coordinates[0];
-        int col = coordinates[1];
+		savedGameModel.resetButtonState(savedModel.getRows(), savedModel.getCols());
+		savedGameModel.setMineCount(savedModel.getNumberOfMines());
+		savedGameModel.setSquareCount(savedModel.getRows() * savedModel.getCols());
+		initiateMines(savedModel.getRows(), savedModel.getCols());
+		savedGameModel.setFirstOpen(true);
 
-        if (gameModel.getButtonsState()[row][col] != GameModel.OPENED) {
-            switch (gameModel.getButtonsState()[row][col]) {
-                case GameModel.CLOSED:
-                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
-                    gameView.getButtons()[row][col].setEnabled(false);
-                    gameModel.getButtonsState()[row][col] = GameModel.FLAGGED;
-                    gameModel.decrementMineCount();
-                    gameView.getNumofmine().setText(String.valueOf(gameModel.getMineCount()));
-                    break;
-                case GameModel.FLAGGED:
-                    gameModel.incrementMineCount();
-                    gameView.mapDisableIcon(gameModel.getMines(), row, col);
-                    gameView.getButtons()[row][col].setEnabled(true);
-                    if (optionsModel.isQuestionMarkEnabled()) {
-                        gameView.getButtons()[row][col].setIcon(gameView.getQuestionMarkIcon());
-                        gameModel.getButtonsState()[row][col] = GameModel.QUESTION_MARKED;
-                    } else {
-                        gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
-                        gameModel.getButtonsState()[row][col] = GameModel.CLOSED;
-                    }
-                    break;
-                case GameModel.QUESTION_MARKED:
-                    gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
-                    gameModel.getButtonsState()[row][col] = GameModel.CLOSED;
-                    break;
-            }
-            gameView.updateGUI();
-        }
-    }
+		for (int row = 0; row < savedRows; row++) {
+			for (int col = 0; col < savedCols; col++) {
+				gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
+				gameView.getButtons()[row][col].setEnabled(true);
+			}
+		}
 
-    @Override
-    public void onMiddleClick(int[] coordinates) {
-        int row = coordinates[0];
-        int col = coordinates[1];
+		gameView.getBtnface().setIcon(gameView.getNewGameIcon());
+		gameView.updateGUI();
 
-        if (gameModel.getButtonsState()[row][col] == GameModel.OPENED) {
-            int flagCount = 0;
-            for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
-                for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
-                    if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0 && nearCol < optionsModel.getCols()) {
-                        if (gameModel.getButtonsState()[nearRow][nearCol] == GameModel.FLAGGED) {
-                            flagCount++;
-                        }
-                    }
+	}
 
-            if (gameModel.getMines()[row][col] == flagCount) {
-                for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
-                    for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
-                        if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0 && nearCol < optionsModel.getCols()) {
-                            if (gameModel.getButtonsState()[nearRow][nearCol] != GameModel.FLAGGED && gameModel.getButtonsState()[nearRow][nearCol] != GameModel.OPENED) {
-                                openSquare(nearRow, nearCol);
-                            }
-                        }
-            }
-        }
-    }
+	@Override
+	public void onExit(ActionEvent event) {
+		gameView.getFrame().dispose();
+		// gameView.getFrame().dispatchEvent(new
+		// WindowEvent(gameView.getFrame(), WindowEvent.WINDOW_CLOSING));
+	}
 
-    private void newGame() {
-        System.out.println("New game");
+	@Override
+	public void onCreateGrid(int i) {
+		// gameView.initiateButtons(optionsModel.getRows(),
+		// optionsModel.getCols());
+		// gameView.createGrid(optionsModel.getRows(), optionsModel.getCols());
+	}
 
-        gameView.getNumofmine().setText(String.valueOf(optionsModel.getNumberOfMines()));
+	@Override
+	public void onOpenSquare(int[] coordinates) {
+		int row = coordinates[0];
+		int col = coordinates[1];
 
-        gameView.getTimer().stop();
-        gameModel.setSeconds(0);
-        gameView.getTimenum().setText("0");
+		if (gameModel.getButtonsState()[row][col] != GameModel.FLAGGED) {
+			if (gameModel.isFirstOpen())
+				firstOpen(row, col);
+			openSquare(row, col);
+		}
+	}
 
-        gameModel.resetButtonState(optionsModel.getRows(), optionsModel.getCols());
-        gameModel.setMineCount(optionsModel.getNumberOfMines());
-        gameModel.setSquareCount(optionsModel.getRows() * optionsModel.getCols());
-        initiateMines(optionsModel.getRows(), optionsModel.getCols());
-        gameModel.setFirstOpen(true);
-    }
+	@Override
+	public void onTimerStart(ActionEvent event) {
+		gameModel.incrementTimer();
+		gameView.getTimenum().setText(String.valueOf(gameModel.getSeconds()));
+	}
 
-    private void firstOpen(int row, int col) {
-        generateMines(row, col);
+	@Override
+	public void onRightClick(int[] coordinates) {
+		int row = coordinates[0];
+		int col = coordinates[1];
 
-        gameView.mapDisableIcons(gameModel.getMines());
-        gameView.getTimer().restart();
-        gameModel.setFirstOpen(false);
-        // gameModel.printMap();
-    }
+		if (gameModel.getButtonsState()[row][col] != GameModel.OPENED) {
+			switch (gameModel.getButtonsState()[row][col]) {
+			case GameModel.CLOSED:
+				gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
+				gameView.getButtons()[row][col].setEnabled(false);
+				gameModel.getButtonsState()[row][col] = GameModel.FLAGGED;
+				gameModel.decrementMineCount();
+				gameView.getNumofmine().setText(String.valueOf(gameModel.getMineCount()));
+				break;
+			case GameModel.FLAGGED:
+				gameModel.incrementMineCount();
+				gameView.mapDisableIcon(gameModel.getMines(), row, col);
+				gameView.getButtons()[row][col].setEnabled(true);
+				if (optionsModel.isQuestionMarkEnabled()) {
+					gameView.getButtons()[row][col].setIcon(gameView.getQuestionMarkIcon());
+					gameModel.getButtonsState()[row][col] = GameModel.QUESTION_MARKED;
+				} else {
+					gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
+					gameModel.getButtonsState()[row][col] = GameModel.CLOSED;
+				}
+				break;
+			case GameModel.QUESTION_MARKED:
+				gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
+				gameModel.getButtonsState()[row][col] = GameModel.CLOSED;
+				break;
+			}
+			gameView.updateGUI();
+		}
+	}
 
-    private void initiateMines(int rows, int cols) {
-        gameModel.initiateMines(rows, cols);
-    }
+	@Override
+	public void onMiddleClick(int[] coordinates) {
+		int row = coordinates[0];
+		int col = coordinates[1];
 
-    private void generateMines(int safeRow, int safeCol) {
-        gameModel.initiateMines(optionsModel.getRows(), optionsModel.getCols());
+		if (gameModel.getButtonsState()[row][col] == GameModel.OPENED) {
+			int flagCount = 0;
+			for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
+				for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
+					if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0
+							&& nearCol < optionsModel.getCols()) {
+						if (gameModel.getButtonsState()[nearRow][nearCol] == GameModel.FLAGGED) {
+							flagCount++;
+						}
+					}
 
-        int minesPlaced = 0;
-        while (minesPlaced < optionsModel.getNumberOfMines()) {
-            int randomRow = gameModel.getRand().nextInt(optionsModel.getRows());
-            int randomCol = gameModel.getRand().nextInt(optionsModel.getCols());
-            if (gameModel.getMines()[randomRow][randomCol] != GameModel.MINE && (randomRow != safeRow || randomCol != safeCol)) {
-                gameModel.getMines()[randomRow][randomCol] = GameModel.MINE;
-                minesPlaced++;
-            }
-        }
+			if (gameModel.getMines()[row][col] == flagCount) {
+				for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
+					for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
+						if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0
+								&& nearCol < optionsModel.getCols()) {
+							if (gameModel.getButtonsState()[nearRow][nearCol] != GameModel.FLAGGED
+									&& gameModel.getButtonsState()[nearRow][nearCol] != GameModel.OPENED) {
+								openSquare(nearRow, nearCol);
+							}
+						}
+			}
+		}
+	}
 
-        for (int row = 0; row < optionsModel.getRows(); row++)
-            for (int col = 0; col < optionsModel.getCols(); col++)
-                if (gameModel.getMines()[row][col] == 0)
-                    for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
-                        for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
-                            if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0 && nearCol < optionsModel.getCols() && gameModel.getMines()[nearRow][nearCol] == GameModel.MINE)
-                                gameModel.getMines()[row][col]++;
+	private void newGame() {
+		System.out.println("New game");
 
-    }
+		gameView.getNumofmine().setText(String.valueOf(optionsModel.getNumberOfMines()));
 
-    private void openSquare(int row, int col) {
-        switch (gameModel.getMines()[row][col]) {
-            case GameModel.EMPTY:
-                gameModel.getButtonsState()[row][col] = GameModel.OPENED;
-                openEmpty(row, col);
-                break;
-            case GameModel.MINE:
-                gameLost(row, col);
-                break;
-            default:
-                open(row, col);
-                break;
-        }
-        gameView.updateGUI();
-    }
+		gameView.getTimer().stop();
+		gameModel.setSeconds(0);
+		gameView.getTimenum().setText("0");
 
-    private void gameLost(int row, int col) {
-        System.out.println("Game lost");
+		gameModel.resetButtonState(optionsModel.getRows(), optionsModel.getCols());
+		gameModel.setMineCount(optionsModel.getNumberOfMines());
+		gameModel.setSquareCount(optionsModel.getRows() * optionsModel.getCols());
+		initiateMines(optionsModel.getRows(), optionsModel.getCols());
+		gameModel.setFirstOpen(true);
+	}
 
-        gameView.getTimer().stop();
-        gameView.getBtnface().setIcon(gameView.getDefeatIcon());
-        gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
-        for (int r = 0; r < optionsModel.getRows(); r++)
-            for (int c = 0; c < optionsModel.getCols(); c++)
-                if (gameView.getButtons()[r][c].isEnabled()) {
-                    if (gameModel.getMines()[r][c] != GameModel.MINE) {
-                        gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
-                    }
-                    gameView.getButtons()[r][c].setEnabled(false);
-                } else if (gameModel.getButtonsState()[r][c] == GameModel.FLAGGED  && gameModel.getMines()[r][c] != GameModel.MINE) {
-                    gameView.getButtons()[r][c].setDisabledIcon(gameView.getCrossedMineIcon());
-                }
-    }
+	private void firstOpen(int row, int col) {
+		generateMines(row, col);
 
-    private void openEmpty(int row, int col) {
-        for (int nearRow = row - 1; nearRow <= row + 1; nearRow++) {
-            for (int nearCol = col - 1; nearCol <= col + 1; nearCol++) {
-                if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0 && nearCol < optionsModel.getCols()) {
-                    if (gameModel.getMines()[nearRow][nearCol] != GameModel.MINE)
-                        if (gameView.getButtons()[nearRow][nearCol].isEnabled())
-                            if (gameModel.getButtonsState()[nearRow][nearCol] != GameModel.FLAGGED) {
-                                open(nearRow, nearCol);
-                                if (gameModel.getMines()[nearRow][nearCol] == GameModel.EMPTY) {
-                                    openEmpty(nearRow, nearCol);
-                                }
-                            }
-                }
-            }
-        }
-    }
+		gameView.mapDisableIcons(gameModel.getMines());
+		gameView.getTimer().restart();
+		gameModel.setFirstOpen(false);
+		// gameModel.printMap();
+	}
 
-    private void open(int row, int col) {
-        gameView.getButtons()[row][col].setEnabled(false);
-        gameModel.getButtonsState()[row][col] = GameModel.OPENED;
-        gameModel.decrementSquareCount();
-        if (wasLastEmptySquare()) gameWon();
-    }
+	private void initiateMines(int rows, int cols) {
+		gameModel.initiateMines(rows, cols);
+	}
 
-    private boolean wasLastEmptySquare() {
-        return gameModel.getSquareCount() - optionsModel.getNumberOfMines() == 0;
-    }
+	private void generateMines(int safeRow, int safeCol) {
+		gameModel.initiateMines(optionsModel.getRows(), optionsModel.getCols());
 
-    private void gameWon() {
-        System.out.println("Game won");
+		int minesPlaced = 0;
+		while (minesPlaced < optionsModel.getNumberOfMines()) {
+			int randomRow = gameModel.getRand().nextInt(optionsModel.getRows());
+			int randomCol = gameModel.getRand().nextInt(optionsModel.getCols());
+			if (gameModel.getMines()[randomRow][randomCol] != GameModel.MINE
+					&& (randomRow != safeRow || randomCol != safeCol)) {
+				gameModel.getMines()[randomRow][randomCol] = GameModel.MINE;
+				minesPlaced++;
+			}
+		}
 
-        gameView.getTimer().stop();
+		for (int row = 0; row < optionsModel.getRows(); row++)
+			for (int col = 0; col < optionsModel.getCols(); col++)
+				if (gameModel.getMines()[row][col] == 0)
+					for (int nearRow = row - 1; nearRow <= row + 1; nearRow++)
+						for (int nearCol = col - 1; nearCol <= col + 1; nearCol++)
+							if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0
+									&& nearCol < optionsModel.getCols()
+									&& gameModel.getMines()[nearRow][nearCol] == GameModel.MINE)
+								gameModel.getMines()[row][col]++;
 
-        gameView.getNumofmine().setText("0");
-        gameView.getBtnface().setIcon(gameView.getVictoryIcon());
+	}
 
-        for (int row = 0; row < optionsModel.getRows(); row++) {
-            for (int col = 0; col < optionsModel.getCols(); col++) {
-                if (gameModel.getMines()[row][col] == GameModel.MINE) {
-                    gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
-                    gameView.getButtons()[row][col].setEnabled(false);
-                }
-            }
-        }
-    }
+	private void openSquare(int row, int col) {
+		switch (gameModel.getMines()[row][col]) {
+		case GameModel.EMPTY:
+			gameModel.getButtonsState()[row][col] = GameModel.OPENED;
+			openEmpty(row, col);
+			break;
+		case GameModel.MINE:
+			gameLost(row, col);
+			break;
+		default:
+			open(row, col);
+			break;
+		}
+		gameView.updateGUI();
+	}
+
+	private void gameLost(int row, int col) {
+		System.out.println("Game lost");
+
+		gameView.getTimer().stop();
+		gameView.getBtnface().setIcon(gameView.getDefeatIcon());
+		gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
+		for (int r = 0; r < optionsModel.getRows(); r++)
+			for (int c = 0; c < optionsModel.getCols(); c++)
+				if (gameView.getButtons()[r][c].isEnabled()) {
+					if (gameModel.getMines()[r][c] != GameModel.MINE) {
+						gameView.getButtons()[r][c].setDisabledIcon(gameView.getUnopenedIcon());
+					}
+					gameView.getButtons()[r][c].setEnabled(false);
+				} else if (gameModel.getButtonsState()[r][c] == GameModel.FLAGGED
+						&& gameModel.getMines()[r][c] != GameModel.MINE) {
+					gameView.getButtons()[r][c].setDisabledIcon(gameView.getCrossedMineIcon());
+				}
+	}
+
+	private void openEmpty(int row, int col) {
+		for (int nearRow = row - 1; nearRow <= row + 1; nearRow++) {
+			for (int nearCol = col - 1; nearCol <= col + 1; nearCol++) {
+				if (nearRow >= 0 && nearRow < optionsModel.getRows() && nearCol >= 0
+						&& nearCol < optionsModel.getCols()) {
+					if (gameModel.getMines()[nearRow][nearCol] != GameModel.MINE)
+						if (gameView.getButtons()[nearRow][nearCol].isEnabled())
+							if (gameModel.getButtonsState()[nearRow][nearCol] != GameModel.FLAGGED) {
+								open(nearRow, nearCol);
+								if (gameModel.getMines()[nearRow][nearCol] == GameModel.EMPTY) {
+									openEmpty(nearRow, nearCol);
+								}
+							}
+				}
+			}
+		}
+	}
+
+	private void open(int row, int col) {
+		gameView.getButtons()[row][col].setEnabled(false);
+		gameModel.getButtonsState()[row][col] = GameModel.OPENED;
+		gameModel.decrementSquareCount();
+		if (wasLastEmptySquare())
+			gameWon();
+	}
+
+	private boolean wasLastEmptySquare() {
+		return gameModel.getSquareCount() - optionsModel.getNumberOfMines() == 0;
+	}
+
+	private void gameWon() {
+		System.out.println("Game won");
+
+		gameView.getTimer().stop();
+
+		gameView.getNumofmine().setText("0");
+		gameView.getBtnface().setIcon(gameView.getVictoryIcon());
+
+		for (int row = 0; row < optionsModel.getRows(); row++) {
+			for (int col = 0; col < optionsModel.getCols(); col++) {
+				if (gameModel.getMines()[row][col] == GameModel.MINE) {
+					gameView.getButtons()[row][col].setDisabledIcon(gameView.getFlagIcon());
+					gameView.getButtons()[row][col].setEnabled(false);
+				}
+			}
+		}
+	}
 }

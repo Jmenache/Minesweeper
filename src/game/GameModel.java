@@ -9,9 +9,9 @@ import java.util.Random;
 public class GameModel {
     private Random rand = new Random();
 
-    private int[][] mines;
+    public int[][] mines;
 
-    private int[][] buttonsState;
+    public int[][] buttonsState;
     static final int CLOSED = 0;
     static final int OPENED = 1;
     static final int FLAGGED = 2;
