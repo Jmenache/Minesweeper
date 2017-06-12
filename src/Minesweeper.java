@@ -11,7 +11,7 @@ public class Minesweeper {
     private Minesweeper() {
         final OptionsModel optionsModel = new OptionsModel();
 
-        final GameView gameView = new GameView();
+        final GameView gameView = new GameView(optionsModel.getRows(), optionsModel.getCols());
         final GameModel gameModel = new GameModel();
         new GamePresenter(gameView, gameModel, optionsModel);
     }

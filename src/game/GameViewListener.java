@@ -12,8 +12,8 @@ public interface GameViewListener{
     void onSaveGame(ActionEvent event);
     void onLoadGame(ActionEvent event);
     void onStatistics(ActionEvent event);
-
     void onExit(ActionEvent event);
+
     // Game
     void onCreateGrid(int i);
     void onOpenSquare(int[] coordinates);

@@ -15,19 +15,17 @@ import java.util.function.BiConsumer;
 
 
 /**
- * game.GameView Class
+ * GameView Class
  */
-@SuppressWarnings("serial")
-public class GameView extends JFrame {
+public class GameView {
     private static final String TITLE = "Minesweeper";
-    // private static final int WIDTH = 400, HEIGHT = 500;
     private final ArrayList<GameViewListener> listeners;
 
     private final GridBagConstraints c;
 
     private final JFrame frame;
 
-    private final JButton[][] buttons;
+    private JButton[][] buttons;
     private final JPanel gridPane;
 
     private final static String ZERO_URL = "/images/200px-Minesweeper_0.svg.png";
@@ -72,16 +70,13 @@ public class GameView extends JFrame {
     private ImageIcon defeatIcon;
     private ImageIcon victoryIcon;
 
-    private JPanel btmpan;
-    private JButton btnmine;
-    private JLabel timenum;
-    private JButton btnface;
-    private JLabel numofmine;
-    private JButton btnTime;
+    private JLabel timeLabel;
+    private JButton faceButton;
+    private JLabel numberOfMinesLabel;
 
     private Timer timer;
 
-    public GameView() {
+    public GameView(int row, int col) {
         // Define Look and Feel
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -95,7 +90,6 @@ public class GameView extends JFrame {
         frame = new JFrame(TITLE);
         frame.setIconImage(frameMineIcon.getImage());
 
-        // frame.setSize(WIDTH ,HEIGHT);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
@@ -109,23 +103,23 @@ public class GameView extends JFrame {
         JMenu helpMenu = new JMenu("?");
 
         JMenuItem newGameItem = new JMenuItem("New game");
-        JMenuItem StatisticsItem  = new JMenuItem("Statistics");
-        JMenuItem OptionsItem  = new JMenuItem("options");
-        JMenuItem SaveItem  = new JMenuItem("Save");
-        JMenuItem LoadItem  = new JMenuItem("Load");
+        JMenuItem statisticsItem  = new JMenuItem("Statistics");
+        JMenuItem optionsItem  = new JMenuItem("Options");
+        JMenuItem saveItem  = new JMenuItem("Save");
+        JMenuItem loadItem  = new JMenuItem("Load");
         JMenuItem exitItem = new JMenuItem("Exit");
 
         newGameItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
-        StatisticsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
-        OptionsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-        SaveItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_MASK));
-        LoadItem.setAccelerator(KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK));
+        statisticsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
+        optionsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+        saveItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_MASK));
+        loadItem.setAccelerator(KeyStroke.getKeyStroke('L', InputEvent.CTRL_MASK));
 
         newGameItem.addActionListener(event -> notifyListeners(GameViewListener::onNewGame, event));
-        OptionsItem.addActionListener(event -> notifyListeners(GameViewListener::onOptions, event));
-        StatisticsItem.addActionListener(event -> notifyListeners(GameViewListener::onStatistics, event));
-        SaveItem.addActionListener(event -> notifyListeners(GameViewListener::onSaveGame, event));
-        LoadItem.addActionListener(event -> notifyListeners(GameViewListener::onLoadGame, event));
+        optionsItem.addActionListener(event -> notifyListeners(GameViewListener::onOptions, event));
+        statisticsItem.addActionListener(event -> notifyListeners(GameViewListener::onStatistics, event));
+        saveItem.addActionListener(event -> notifyListeners(GameViewListener::onSaveGame, event));
+        loadItem.addActionListener(event -> notifyListeners(GameViewListener::onLoadGame, event));
         exitItem.addActionListener(event -> notifyListeners(GameViewListener::onExit, event));
 
         // Add Menu
@@ -137,12 +131,12 @@ public class GameView extends JFrame {
         gameMenu.add(newGameItem);
 
         gameMenu.addSeparator();
-        gameMenu.add(StatisticsItem);
-        gameMenu.add(OptionsItem);
+        gameMenu.add(statisticsItem);
+        gameMenu.add(optionsItem);
 
         gameMenu.addSeparator();
-        gameMenu.add(SaveItem);
-        gameMenu.add(LoadItem);
+        gameMenu.add(saveItem);
+        gameMenu.add(loadItem);
 
         gameMenu.addSeparator();
         gameMenu.add(exitItem);
@@ -156,48 +150,39 @@ public class GameView extends JFrame {
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
 
-        int rowAndCol = 9;
-        buttons = new JButton[rowAndCol][rowAndCol];
-        // notifyListeners(GameViewListener::onCreateGrid, 0);
-        createGrid(rowAndCol, rowAndCol);
+        newGrid(row, col);
 
         // Create South Border
-        btmpan = new JPanel();
-        btmpan.setLayout(new GridLayout());
-        pane.add(btmpan, BorderLayout.SOUTH);
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new GridLayout());
+        pane.add(bottomPanel, BorderLayout.SOUTH);
 
-        btnmine = new JButton("mines");
-        btnmine.setEnabled(false);
-        // btnmine.setBounds(14, 5, 63, 27);
-        btmpan.add(btnmine);
+        JButton mineButton = new JButton("Mines");
+        mineButton.setEnabled(false);
+        bottomPanel.add(mineButton);
 
-        numofmine = new JLabel();
-        // numofmine.setBounds(427, 6, 116, 24);
-        btmpan.add(numofmine);
+        numberOfMinesLabel = new JLabel();
+        bottomPanel.add(numberOfMinesLabel);
 
+        faceButton = new JButton(newGameIcon);
+        faceButton.setBorderPainted(false);
+        faceButton.setBorder(null);
+        faceButton.setFocusable(false);
+        faceButton.setMargin(new Insets(0, 0, 0, 0));
+        faceButton.setContentAreaFilled(false);
+        faceButton.setFocusPainted(false);
+        faceButton.setRolloverEnabled(false);
+        faceButton.addActionListener(event -> notifyListeners(GameViewListener::onNewGame, event));
+        bottomPanel.add(faceButton);
 
-        btnface = new JButton(newGameIcon);
-        btnface.setBorderPainted(false);
-        btnface.setBorder(null);
-        btnface.setFocusable(false);
-        btnface.setMargin(new Insets(0, 0, 0, 0));
-        btnface.setContentAreaFilled(false);
-        btnface.setFocusPainted(false);
-        btnface.setRolloverEnabled(false);
-        btnface.addActionListener(event -> notifyListeners(GameViewListener::onNewGame, event));
-        // btnface.setBounds(284, 5, 65, 27);
-        btmpan.add(btnface);
-
-        timenum = new JLabel();
+        timeLabel = new JLabel();
         timer = new Timer( 1000, e -> notifyListeners(GameViewListener::onTimerStart, e));
         timer.setInitialDelay(0);
-        // timenum.setBounds(91, 6, 116, 24);
-        btmpan.add(timenum);
+        bottomPanel.add(timeLabel);
 
-        btnTime = new JButton("time");
-        btnTime.setEnabled(false);
-        // btnTime.setBounds(557, 5, 59, 27);
-        btmpan.add(btnTime);
+        JButton timeButton = new JButton("Time");
+        timeButton.setEnabled(false);
+        bottomPanel.add(timeButton);
 
         // Conclude view creation
         this.listeners = new ArrayList<>();
@@ -209,6 +194,13 @@ public class GameView extends JFrame {
     // void initiateButtons(int rows, int cols) {
     //     buttons = new JButton[rows][cols];
     // }
+
+    void newGrid(int row, int col) {
+        gridPane.removeAll();
+
+        buttons = new JButton[row][col];
+        createGrid(row, col);
+    }
 
     private void initIcons() {
         zeroIcon = initIcon(ZERO_URL);
@@ -336,8 +328,8 @@ public class GameView extends JFrame {
     }
 
 	void updateGUI() {
-		revalidate();
-		repaint();
+		frame.revalidate();
+        frame.repaint();
 	}
 
     void addListener(final GameViewListener listener) {
@@ -388,16 +380,16 @@ public class GameView extends JFrame {
         return victoryIcon;
     }
 
-    JLabel getNumofmine() {
-        return numofmine;
+    JLabel getNumberOfMinesLabel() {
+        return numberOfMinesLabel;
     }
 
-    JLabel getTimenum() {
-        return timenum;
+    JLabel getTimeLabel() {
+        return timeLabel;
     }
 
-    JButton getBtnface() {
-        return btnface;
+    JButton getFaceButton() {
+        return faceButton;
     }
 
     Timer getTimer() {

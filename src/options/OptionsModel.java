@@ -12,67 +12,70 @@ public class OptionsModel {
     private int level;
 
 	private boolean saveOnExitEnabled;
-	private boolean loadSavedGameEnabled;
+	private boolean alwaysContinueGameEnabled;
     private boolean questionMarkEnabled = false;
 	
 	public OptionsModel() {
 		setToBeginnerLevel();
 	}
 
-	private void setToBeginnerLevel() {
+	void setToBeginnerLevel() {
 	    this.rows = 9;
         this.cols = 9;
         this.numberOfMines = 10;
     }
 
-    void setToInterediateLevel() {
+    void setToIntermediateLevel() {
         this.rows = 16;
         this.cols = 16;
         this.numberOfMines = 40;
     }
 
     void setToAdvancedLevel() {
-        this.rows = 16;
-        this.cols = 30;
+        this.rows = 30;
+        this.cols = 16;
         this.numberOfMines = 99;
     }
 
-    void setToCutomLevel(int rows, int cols, int numberOfMines) {
+    void setToCustomLevel(int rows, int cols, int numberOfMines) {
         this.rows = rows;
         this.cols = cols;
         this.numberOfMines = numberOfMines;
     }
 
-
-
-
-
-
-	public OptionsModel(int num, int h, int w) {
-		this.numberOfMines = num;
-		this.rows = h;
-		this.cols = w;
-	}
 	public int getNumberOfMines() {
 		return numberOfMines;
 	}
-	public void setNumberOfMines(int numberOfMines) {
-		this.numberOfMines = numberOfMines;
-	}
+
 	public int getRows() {
 		return rows;
 	}
-	public void setRows(int rows) {
-		this.rows = rows;
-	}
+
 	public int getCols() {
 		return cols;
-	}
-	public void setCols(int cols) {
-		this.cols = cols;
 	}
 
     public boolean isQuestionMarkEnabled() {
         return questionMarkEnabled;
+    }
+
+    public boolean isSaveOnExitEnabled() {
+        return saveOnExitEnabled;
+    }
+
+    public boolean isAlwaysContinueGameEnabled() {
+        return alwaysContinueGameEnabled;
+    }
+
+    void setSaveOnExitEnabled(boolean saveOnExitEnabled) {
+        this.saveOnExitEnabled = saveOnExitEnabled;
+    }
+
+    void setAlwaysContinueGameEnabled(boolean alwaysContinueGameEnabled) {
+        this.alwaysContinueGameEnabled = alwaysContinueGameEnabled;
+    }
+
+    void setQuestionMarkEnabled(boolean questionMarkEnabled) {
+        this.questionMarkEnabled = questionMarkEnabled;
     }
 }

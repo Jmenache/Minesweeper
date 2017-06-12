@@ -41,7 +41,7 @@ public class GamePresenter implements GameViewListener {
             }
         }
 
-        gameView.getBtnface().setIcon(gameView.getNewGameIcon());
+        gameView.getFaceButton().setIcon(gameView.getNewGameIcon());
 
         gameView.updateGUI();
     }
@@ -55,15 +55,9 @@ public class GamePresenter implements GameViewListener {
     public void onOptions(ActionEvent event) {
         OptionsView optionsView = new OptionsView();
         new OptionsPresenter(optionsView, optionsModel);
-
-        /*optionsView.setVisible(true);
-        if(optionsView.isClickedOK()) {
-            optionsModel = optionsView.getOptionsModel();
-            System.out.println(optionsModel.getCols() + "," + optionsModel.getRows() + "," + optionsModel.getNumberOfMines());
-            gameView.updateGUI();
-        }*/
-
-        //optionsView.dispose();
+        gameView.newGrid(optionsModel.getRows(), optionsModel.getCols());
+        gameView.updateGUI();
+        newGame();
     }
 
     @Override
@@ -101,8 +95,10 @@ public class GamePresenter implements GameViewListener {
 
     @Override
     public void onExit(ActionEvent event) {
+        if (optionsModel.isSaveOnExitEnabled()) {
+            onSaveGame(event);
+        }
         gameView.getFrame().dispose();
-        // gameView.getFrame().dispatchEvent(new WindowEvent(gameView.getFrame(), WindowEvent.WINDOW_CLOSING));
     }
 
     @Override
@@ -125,7 +121,7 @@ public class GamePresenter implements GameViewListener {
     @Override
     public void onTimerStart(ActionEvent event) {
         gameModel.incrementTimer();
-        gameView.getTimenum().setText(String.valueOf(gameModel.getSeconds()));
+        gameView.getTimeLabel().setText(String.valueOf(gameModel.getSeconds()));
     }
 
     @Override
@@ -140,7 +136,7 @@ public class GamePresenter implements GameViewListener {
                     gameView.getButtons()[row][col].setEnabled(false);
                     gameModel.getButtonsState()[row][col] = GameModel.FLAGGED;
                     gameModel.decrementMineCount();
-                    gameView.getNumofmine().setText(String.valueOf(gameModel.getMineCount()));
+                    gameView.getNumberOfMinesLabel().setText(String.valueOf(gameModel.getMineCount()));
                     break;
                 case GameModel.FLAGGED:
                     gameModel.incrementMineCount();
@@ -193,11 +189,11 @@ public class GamePresenter implements GameViewListener {
     private void newGame() {
         System.out.println("New game");
 
-        gameView.getNumofmine().setText(String.valueOf(optionsModel.getNumberOfMines()));
+        gameView.getNumberOfMinesLabel().setText(String.valueOf(optionsModel.getNumberOfMines()));
 
         gameView.getTimer().stop();
         gameModel.setSeconds(0);
-        gameView.getTimenum().setText("0");
+        gameView.getTimeLabel().setText("0");
 
         gameModel.resetButtonState(optionsModel.getRows(), optionsModel.getCols());
         gameModel.setMineCount(optionsModel.getNumberOfMines());
@@ -262,7 +258,7 @@ public class GamePresenter implements GameViewListener {
         System.out.println("Game lost");
 
         gameView.getTimer().stop();
-        gameView.getBtnface().setIcon(gameView.getDefeatIcon());
+        gameView.getFaceButton().setIcon(gameView.getDefeatIcon());
         gameView.getButtons()[row][col].setDisabledIcon(gameView.getExplodedMineIcon());
         for (int r = 0; r < optionsModel.getRows(); r++)
             for (int c = 0; c < optionsModel.getCols(); c++)
@@ -309,8 +305,8 @@ public class GamePresenter implements GameViewListener {
 
         gameView.getTimer().stop();
 
-        gameView.getNumofmine().setText("0");
-        gameView.getBtnface().setIcon(gameView.getVictoryIcon());
+        gameView.getNumberOfMinesLabel().setText("0");
+        gameView.getFaceButton().setIcon(gameView.getVictoryIcon());
 
         for (int row = 0; row < optionsModel.getRows(); row++) {
             for (int col = 0; col < optionsModel.getCols(); col++) {
