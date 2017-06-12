@@ -6,9 +6,13 @@ import options.OptionsPresenter;
 import options.OptionsView;
 
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Scanner;
 
 /**
  * game.GamePresenter Class
@@ -88,8 +92,93 @@ public class GamePresenter implements GameViewListener {
         }
     }
 
+    @SuppressWarnings("resource")
     @Override
     public void onLoadGame(ActionEvent event) {
+        int savedRows = 0;
+        int savedCols =0;
+        int savedTime =0;
+        int savedNumMines =0;
+        
+        int savedSet[][];
+        OptionsModel savedModel = new OptionsModel(/*savedNumMines, savedRows, savedCols*/);
+        GameModel savedGameModel = new GameModel();
+        savedGameModel.initiateMines(savedRows, savedCols);
+        savedGameModel.resetButtonState(savedRows, savedCols);
+        
+        String tmp[] = null;
+        try {
+            String savedFile = "data.txt";
+            String line = "";
+            BufferedReader br = new BufferedReader(new FileReader(savedFile));
+             if((line = br.readLine()) != null)
+                savedRows=Integer.parseInt(line);
+             if((line = br.readLine()) != null)
+                savedCols=Integer.parseInt(line);
+             if((line = br.readLine()) != null)
+                savedTime=Integer.parseInt(line);
+             if((line = br.readLine()) != null)
+                savedNumMines=Integer.parseInt(line);
+
+             System.out.println(savedTime);
+             //for mine view setting
+             for (int row = 0; row < savedRows; row++) {
+                 if((line = br.readLine()) != null){
+                     tmp=line.split(" ");
+                 }
+                 for (int col = 0; col < savedCols; col++) {
+                    System.out.print(Integer.parseInt(tmp[col])+",");   
+                    /*if(tmp[col]=="-1")
+                        savedGameModel.mines[row][col]=-1;
+                    else
+                    savedGameModel.mines[row][col]=Integer.parseInt(tmp[col]);
+                    */
+                    }
+                 System.out.println();
+                }
+             
+             //for mine buttonsState view setting
+             for (int row = 0; row < savedRows; row++) {
+                 if((line = br.readLine()) != null){
+                     tmp=line.split(" ");
+                 }
+                 for (int col = 0; col < savedCols; col++) {
+                    System.out.print(Integer.parseInt(tmp[col])+",");   
+                    /*if(tmp[col]=="-1")
+                        savedGameModel.buttonsState[row][col]=-1;
+                    else
+                    savedGameModel.buttonsState[row][col]=Integer.parseInt(tmp[col]);
+                    */
+                    }
+                 System.out.println();
+                }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        
+        
+        gameView.getNumberOfMinesLabel().setText(String.valueOf(savedModel.getNumberOfMines()));
+
+        gameView.getTimer().stop();
+        savedGameModel.setSeconds(savedTime);
+        gameView.getTimeLabel().setText(savedTime+"");
+
+        savedGameModel.resetButtonState(savedModel.getRows(), savedModel.getCols());
+        savedGameModel.setMineCount(savedModel.getNumberOfMines());
+        savedGameModel.setSquareCount(savedModel.getRows() * savedModel.getCols());
+        initiateMines(savedModel.getRows(), savedModel.getCols());
+        savedGameModel.setFirstOpen(true);
+
+        for (int row = 0; row < savedRows; row++) {
+            for (int col = 0; col < savedCols; col++) {
+                gameView.getButtons()[row][col].setIcon(gameView.getUnopenedIcon());
+                gameView.getButtons()[row][col].setEnabled(true);
+            }
+        }
+
+        gameView.getFaceButton().setIcon(gameView.getNewGameIcon());
+        gameView.updateGUI();
 
     }
 
