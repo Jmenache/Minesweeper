@@ -6,13 +6,7 @@ import options.OptionsPresenter;
 import options.OptionsView;
 
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Scanner;
+import java.io.*;
 
 /**
  * game.GamePresenter Class
