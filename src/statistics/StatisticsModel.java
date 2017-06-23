@@ -1,4 +1,4 @@
-package Statistics;
+package statistics;
 
 public class StatisticsModel {
 

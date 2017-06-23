@@ -1,4 +1,4 @@
-package Statistics;
+package statistics;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

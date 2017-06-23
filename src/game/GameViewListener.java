@@ -8,10 +8,11 @@ import java.awt.event.ActionEvent;
 public interface GameViewListener{
     // Menu
     void onNewGame(ActionEvent event);
+    // TODO: Should clarify names of onStatistics and onOptions
+    void onStatistics(ActionEvent event);
     void onOptions(ActionEvent event);
     void onSaveGame(ActionEvent event);
     void onLoadGame(ActionEvent event);
-    void onStatistics(ActionEvent event);
     void onExit(ActionEvent event);
 
     // Game

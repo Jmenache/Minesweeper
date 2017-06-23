@@ -15,6 +15,24 @@ public class OptionsPresenter implements OptionsViewListener {
         this.optionsModel = optionsModel;
         this.optionsView = optionsView;
         optionsView.addListener(this);
+
+        switch (optionsModel.getLevel()) {
+            case OptionsModel.BEGINNER:
+                optionsView.getBeginnerButton().setSelected(true);
+                break;
+            case OptionsModel.INTERMEDIATE:
+                optionsView.getIntermediateButton().setSelected(true);
+                break;
+            case OptionsModel.ADVANCED:
+                optionsView.getAdvanceButton().setSelected(true);
+                break;
+            case OptionsModel.CUSTOM:
+                optionsView.getCustomButton().setSelected(true);
+                optionsView.getRowsTextField().setText(String.valueOf(optionsModel.getRows()));
+                optionsView.getColsTextField().setText(String.valueOf(optionsModel.getCols()));
+                optionsView.getNumberOfMinesTextField().setText(String.valueOf(optionsModel.getNumberOfMines()));
+                break;
+        }
     }
 
     @Override
@@ -37,11 +55,11 @@ public class OptionsPresenter implements OptionsViewListener {
         optionsModel.setSaveOnExitEnabled(optionsView.getSaveOnExitCheckbox().isSelected());
         optionsModel.setAlwaysContinueGameEnabled(optionsView.getAlwaysContinueGameCheckbox().isSelected());
         optionsModel.setQuestionMarkEnabled(optionsView.getQuestionMarkCheckbox().isSelected());
-        optionsView.dispose();
+        optionsView.getFrame().dispose();
     }
 
     @Override
     public void onCancel(ActionEvent event) {
-        optionsView.dispose();
+        optionsView.getFrame().dispose();
     }
 }

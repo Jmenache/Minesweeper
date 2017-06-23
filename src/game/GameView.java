@@ -41,6 +41,7 @@ public class GameView {
     private final static String QUESTION_MARK_URL = "/images/200px-Minesweeper_questionMark.svg.png";
     private final static String UNOPENED_URL = "/images/200px-Minesweeper_unopened_square.svg.png";
     private final static String FRAME_MINE_URL = "/images/mineIcon.png";
+    // TODO: Could be WRONG_FLAG_PLACEMENT_URL
     private final static String CROSSED_MINE_URL = "/images/crossedMine.jpg";
     private final static String MINE_URL = "/images/mine.jpg";
     private static final String EXPLODED_MINE_URL = "/images/1200x630bb.jpg";
@@ -103,7 +104,7 @@ public class GameView {
         JMenu helpMenu = new JMenu("?");
 
         JMenuItem newGameItem = new JMenuItem("New game");
-        JMenuItem statisticsItem  = new JMenuItem("Statistics");
+        JMenuItem statisticsItem  = new JMenuItem("statistics");
         JMenuItem optionsItem  = new JMenuItem("Options");
         JMenuItem saveItem  = new JMenuItem("Save");
         JMenuItem loadItem  = new JMenuItem("Load");
@@ -198,8 +199,12 @@ public class GameView {
     void newGrid(int row, int col) {
         gridPane.removeAll();
 
+
         buttons = new JButton[row][col];
         createGrid(row, col);
+        frame.pack();
+        frame.setResizable(false);
+        frame.setVisible(true);
     }
 
     private void initIcons() {

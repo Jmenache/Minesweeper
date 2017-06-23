@@ -8,9 +8,9 @@ import java.util.Random;
 public class GameModel {
     private Random rand = new Random();
 
-    public int[][] mines;
+    private int[][] mineField;
 
-    public int[][] buttonsState;
+    private int[][] buttonsState;
     static final int CLOSED = 0;
     static final int OPENED = 1;
     static final int FLAGGED = 2;
@@ -20,7 +20,7 @@ public class GameModel {
 
     private int squareCount;
     private int mineCount;
-    private boolean firstOpen;
+    private boolean newMineField;
 
     static final int EMPTY = 0;
     static final int MINE = -1;
@@ -29,8 +29,8 @@ public class GameModel {
         return rand;
     }
 
-    void initiateMines(int rows, int cols) {
-        mines = new int[rows][cols];
+    void initiateMineField(int rows, int cols) {
+        mineField = new int[rows][cols];
     }
 
     void resetButtonState(int rows, int cols){
@@ -41,20 +41,20 @@ public class GameModel {
     //     System.out.println("This is the bomb map: ");
     //     for(int i = 0; i < rows; i++) {
     //         for(int j = 0; j < cols; j++) {
-    //             if (mines[i][j] == MINE){
+    //             if (mineField[i][j] == MINE){
     //                 System.out.printf("%5s", "*");
-    //             } else if (mines[i][j] == 0) {
+    //             } else if (mineField[i][j] == 0) {
     //                 System.out.printf("%5s", "-");
     //             } else {
-    //                 System.out.printf("%5d", mines[i][j]);
+    //                 System.out.printf("%5d", mineField[i][j]);
     //             }
     //         }
     //         System.out.println();
     //     }
     // }
 
-    int[][] getMines() {
-        return mines;
+    int[][] getMineField() {
+        return mineField;
     }
 
     int[][] getButtonsState() {
@@ -101,11 +101,11 @@ public class GameModel {
         this.mineCount = mineCount;
     }
 
-    boolean isFirstOpen() {
-        return firstOpen;
+    boolean isNewMineField() {
+        return newMineField;
     }
 
-    void setFirstOpen(boolean firstOpen) {
-        this.firstOpen = firstOpen;
+    void setNewMineField(boolean newMineField) {
+        this.newMineField = newMineField;
     }
 }

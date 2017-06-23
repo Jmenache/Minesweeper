@@ -20,27 +20,31 @@ public class OptionsModel {
 	}
 
 	void setToBeginnerLevel() {
-	    this.rows = 9;
-        this.cols = 9;
-        this.numberOfMines = 10;
+	    rows = 9;
+        cols = 9;
+        numberOfMines = 10;
+        level = BEGINNER;
     }
 
     void setToIntermediateLevel() {
-        this.rows = 16;
-        this.cols = 16;
-        this.numberOfMines = 40;
+        rows = 16;
+        cols = 16;
+        numberOfMines = 40;
+        level = INTERMEDIATE;
     }
 
     void setToAdvancedLevel() {
-        this.rows = 30;
-        this.cols = 16;
-        this.numberOfMines = 99;
+        rows = 30;
+        cols = 16;
+        numberOfMines = 99;
+        level = ADVANCED;
     }
 
     void setToCustomLevel(int rows, int cols, int numberOfMines) {
         this.rows = rows;
         this.cols = cols;
         this.numberOfMines = numberOfMines;
+        level = CUSTOM;
     }
 
 	public int getNumberOfMines() {
@@ -54,6 +58,10 @@ public class OptionsModel {
 	public int getCols() {
 		return cols;
 	}
+
+    int getLevel() {
+        return level;
+    }
 
     public boolean isQuestionMarkEnabled() {
         return questionMarkEnabled;
